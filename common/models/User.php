@@ -21,13 +21,26 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ *
+ * @property string|null $phone
+ * @property string|null $fio
+ * @property int|null $age
+ * @property string|null $study_place
+ * @property string|null $experience
+ * @property int|null $period
+ * @property boolean|null $work_status
+ * @property string|null $comment
+ * @property int|null $last_point
+ * @property Team[] $teams
+ * @property UserAnswer[] $userAnswers
+ * @property UserRole[] $userRoles
+ * @property UserTeam[] $userTeams
  */
 class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
-
 
     /**
      * {@inheritdoc}

@@ -29,7 +29,7 @@ class m191204_194934_create_useranswer_question_fk extends Migration
     public function safeDown()
     {
         $this->dropForeignKey(
-            'fk-user-answer-answer_id',
+            'fk-user-answer-question_id',
             'user_answer'
         );
     }

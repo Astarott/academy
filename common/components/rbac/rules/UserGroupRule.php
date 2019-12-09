@@ -1,5 +1,5 @@
 <?php
-namespace common\components\rbac;
+namespace common\components\rbac\rules;
 use Yii;
 use yii\rbac\Rule;
 
@@ -25,16 +25,6 @@ class UserGroupRule extends Rule
             elseif ($item->name === 'lead') {
                 return $group == 'admin' || $group == 'lead';
             }
-
-
-//            elseif ($item->name === 'BRAND')
-//            {
-//                return $group == 'admin' || $group == 'BRAND';
-//            }
-//            elseif ($item->name === 'TALENT')
-//            {
-//                return $group == 'admin' || $group == 'TALENT';
-//            }
         }
         return true;
     }

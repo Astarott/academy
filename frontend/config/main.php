@@ -10,13 +10,14 @@ return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
-            'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
-            ],
+//            'parsers' => [
+//                'application/json' => 'yii\web\JsonParser',
+//            ],
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -44,19 +45,17 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'enableStrictParsing' => true,
+//            'enableStrictParsing' => true,
             'rules' => [
-
-//                '/' => 'site/index',
-//                'products'  => 'site/index',
-//                'products/add'  => 'site/index',
-//                'products/<id:\d+>'  => 'site/index',
-
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'product',
-                    'prefix' => 'api', //api будет доступен по url, начинающимся с /api/products
-                ],
+//                  '' => 'site/index',
+//                  '<_c:[\w-]+>' => '<_c>/index',
+//                  '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
+//                  '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
+//                [
+////                    'class' => 'yii\rest\UrlRule',
+////                    'controller' => 'test',
+////                    'prefix' => 'api', //api будет доступен по url, начинающимся с /api/test
+//                ],
             ],
         ],
 

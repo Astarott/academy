@@ -2,7 +2,8 @@
 namespace console\controllers;
 
 
-use common\components\rbac\UserGroupRule;
+use common\components\rbac\Rbac;
+use common\components\rbac\rules\UserGroupRule;
 use Yii;
 use yii\console\Controller;
 
@@ -21,12 +22,9 @@ class RbacController extends Controller
         $student = $authManager->createRole('student');
         $lead = $authManager->createRole('lead');
 
-//        $brand  = $authManager->createRole('BRAND');
-//        $talent = $authManager->createRole('TALENT');
-
         // Create simple, based on action{$NAME} permissions
-        $login  = $authManager->createPermission('login');
-        $logout = $authManager->createPermission('logout');
+        $login  = $authManager->createPermission(Rbac::LOGIN);
+        $logout = $authManager->createPermission(Rbac::LOGOUT);
 
         $error  = $authManager->createPermission('error');
         $index  = $authManager->createPermission('index');
@@ -61,8 +59,6 @@ class RbacController extends Controller
         $supervisor->ruleName = $userGroupRule->name;
         $supermentor->ruleName = $userGroupRule->name;
 
-//        $brand->ruleName  = $userGroupRule->name;
-//        $talent->ruleName = $userGroupRule->name;
 
         // Add roles in Yii::$app->authManager
         $authManager->add($guest);
@@ -72,9 +68,6 @@ class RbacController extends Controller
         $authManager->add($supervisor);
         $authManager->add($mentor);
         $authManager->add($supermentor);
-
-//        $authManager->add($brand);
-//        $authManager->add($talent);
 
         // Add permission-per-role in Yii::$app->authManager
         // Guest
@@ -109,17 +102,6 @@ class RbacController extends Controller
         // Admin
         $authManager->addChild($admin, $delete);
         $authManager->addChild($admin, $supermentor);
-
-//        $authManager->addChild($admin, $talent);
-//        $authManager->addChild($admin, $brand);
-
-        // BRAND
-//        $authManager->addChild($brand, $update);
-//        $authManager->addChild($brand, $guest);
-//
-//      // TALENT
-//        $authManager->addChild($talent, $update);
-//        $authManager->addChild($talent, $guest);
 
     }
 }

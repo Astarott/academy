@@ -30,7 +30,7 @@ class m191204_171458_create_testquestion_test_fk extends Migration
     {
         $this->dropForeignKey(
             'fk-test-question-test_id',
-            'test-question'
+            'test_question'
         );
     }
 

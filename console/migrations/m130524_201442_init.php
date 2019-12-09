@@ -33,7 +33,7 @@ class m130524_201442_init extends Migration
             'study_place'=>$this->string(),
             'experience'=>$this->string(255),
             'period' => $this->integer(),
-            'work_status'=>$this->string(),
+            'work_status'=>$this->boolean()->defaultValue(false),
             'comment'=>$this->string(),
 
             'last_point'=> $this->integer(),
