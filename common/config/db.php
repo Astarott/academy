@@ -1,12 +1,11 @@
 <?php
-
 return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => env('DB_DSN'),
-            'username' => env('DB_USERNAME'),
-            'password' => env('DB_PASSWORD'),
+            'dsn' => 'pgsql:host=localhost;dbname=academy',
+            'username' => 'test_user',
+            'password' => 'qwerty',
             'charset' => 'utf8',
         ]
     ]
