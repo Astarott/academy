@@ -59,7 +59,7 @@ return [
                   '' => 'site/index',
                   'auth' => 'site/login',
 
-                  'mail' => 'user/send-mail',
+                  'mail' => 'user/signup',
 
                   '<_c:[\w-]+>' => '<_c>/index',
                   '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',

@@ -1,5 +1,5 @@
 <?php
-namespace api\controllers;
+namespace api\controllers\v1;
 
 //use frontend\models\ResendVerificationEmailForm;
 //use frontend\models\VerifyEmailForm;

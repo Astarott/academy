@@ -1,6 +1,6 @@
 <?php
 
-namespace api\controllers;
+namespace api\controllers\v1;
 use yii\rest\Controller;
 
 class MailController extends Controller

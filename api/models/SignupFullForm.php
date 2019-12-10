@@ -1,6 +1,5 @@
 <?php
 
-
 namespace api\models;
 
 //use api\models\Token;
@@ -8,11 +7,16 @@ namespace api\models;
 use common\models\User;
 use Yii;
 
-class SignupForm extends User
+class SignupFullForm extends User
 {
-    public $email;
-    public $phone;
-    public $fio;
+//    public $email;
+//    public $phone;
+//    public $fio;
+//    public $
+
+
+
+
 
     public function rules()
     {
@@ -28,7 +32,7 @@ class SignupForm extends User
         ];
     }
 
-    public function signup()
+    public function signupfirst()
     {
         if (!$this->validate())
         {
@@ -39,14 +43,28 @@ class SignupForm extends User
         $user->email = $this->email;
         $user->phone = $this->phone;
         $user->fio = $this->fio;
-//        return $user->save();
         return $user->save() && $this->sendEmail($user);
+    }
+
+
+    public function signupfull()
+    {
+        if (!$this->validate())
+        {
+            return null;
+        };
+//        $user ->getuser();
+//        $user->status = User::STATUS_LEAD;
+//        $user->email = $this->email;
+//        $user->phone = $this->phone;
+//        $user->fio = $this->fio;
+//        return $user->save() && $this->sendEmail($user);
     }
 
     /**
      * Sends confirmation email to user
      * @param User $user user model to with email should be send
-     * @return bool whether the email was sent
+    //     * @return bool whether the email was sent
      */
     protected function sendEmail($user)
     {
