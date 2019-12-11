@@ -68,7 +68,7 @@ return [
             'enableStrictParsing' => true,
             'rules' => [
                 ''=> 'v1/user/',
-                  'getallstudents' => 'v1/user/index',
+                  'getallstudents' => 'v1/user/getallstudents',
 //                  'auth' => 'site/login',
                   'POST /v1/mail' => 'v1/user/signup',
                   '/v1/signup' => 'v1/user/signup-second',

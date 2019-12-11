@@ -44,11 +44,11 @@ class UserController extends ActiveController
         return ($model);
     }
 
-    public function actionGetAllStudents(){
+    public function actionGetallstudents(){
         $query = new Query();
-        $query->select('*')->from('token')->join('JOIN','user','token.user_id = user.id')->where('token')->all();
-        $comsmand = $query->createCommand();
-        $resp = $comsmand->query();
+        $query->select('user.fio')->from('{{token}}')->join('JOIN','{{public.user}}','public.user.id = public.token.user_id')->where(['public.user.status' => 11])->all();
+        $command = $query->createCommand();
+        $resp = $command->query();
         return $resp;
     }
 
