@@ -32,15 +32,15 @@ return [
                 'text/xml' => 'yii\web\XmlParser',
             ],
         ],
-        'response' => [
-            'formatters' => [
-                'json' => [
-                    'class' => 'yii\web\JsonResponseFormatter',
-                    'prettyPrint' => YII_DEBUG,
-                    'encodeOptions' => JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
-                ],
-            ],
-        ],
+//        'response' => [
+//            'formatters' => [
+//                'json' => [
+//                    'class' => 'yii\web\JsonResponseFormatter',
+//                    'prettyPrint' => YII_DEBUG,
+//                    'encodeOptions' => JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+//                ],
+//            ],
+//        ],
         'user' => [
             'identityClass' => 'common\models\User',
 //            'enableAutoLogin' => true,
@@ -67,10 +67,9 @@ return [
             'showScriptName' => false,
             'enableStrictParsing' => true,
             'rules' => [
-
-                  '' => 'v1/site/index',
+                ''=> 'v1/user/',
+                  'getallstudents' => 'v1/user/getallstudents',
 //                  'auth' => 'site/login',
-//
                   'POST /v1/mail' => 'v1/user/signup',
                   '/v1/signup' => 'v1/user/signup-second',
 //                  '<_c:[\w-]+>' => '<_c>/index',

@@ -6,6 +6,7 @@ use api\models\SignupForm;
 use api\models\SignupFullForm;
 use common\models\User;
 use Yii;
+use yii\db\Query;
 use yii\helpers\Url;
 use yii\rest\ActiveController;
 use yii\web\ServerErrorHttpException;
@@ -24,22 +25,31 @@ class UserController extends ActiveController
 
     public function actionSignup()
     {
-        $requestParams = Yii::$app->getRequest()->getBodyParams();
+//        $requestParams = Yii::$app->getRequest()->getBodyParams();
         if (empty($requestParams)) {
             $requestParams = Yii::$app->getRequest()->getQueryParams();
         }
         $model = new SignupForm();
+        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
         $model->phone = $requestParams['phone'];
         $model->email = $requestParams['email'];
         $model->fio = $requestParams['fio'];
 
         if ($model->signup())
-            return ("Пользователь успешно сохранен");
+            return ['message' => 'Пользователь успешно сохранен'];
 //            $response = Yii::$app->getResponse();
 //            $response->setStatusCode(201);
-        else if (!$model->hasErrors())
-            throw new ServerErrorHttpException('Невозможно создать пользователя по неизвестным причинам.');
+        else if (!$model->hasErrors()){
+            throw new ServerErrorHttpException('Невозможно создать пользователя по неизвестным причинам.');}
         return ($model);
+    }
+
+    public function actionGetallstudents(){
+        $query = new Query();
+        $query->select('user.fio')->from('{{token}}')->join('JOIN','{{public.user}}','public.user.id = public.token.user_id')->where(['public.user.status' => 11])->all();
+        $command = $query->createCommand();
+        $resp = $command->query();
+        return $resp;
     }
 
     public function actionSignupSecond()
