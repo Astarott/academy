@@ -30,6 +30,7 @@ class SignupForm extends User
 
     public function signup()
     {
+//        return ($this->validate());
         if (!$this->validate())
         {
             return null;
@@ -43,25 +44,6 @@ class SignupForm extends User
         return $_user->save() && $this->generateTokenToUser();
 //        return $user->save() && $this->sendEmail($user);
     }
-
-//    /**
-//     * Sends confirmation email to user
-//     * @param User $user user model to with email should be send
-//     * @return bool whether the email was sent
-//     */
-//    protected function sendEmail($user)
-//    {
-//        return Yii::$app
-//            ->mailer
-//            ->compose(
-//                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-//                ['user' => $user]
-//            )
-//            ->setFrom([Yii::$app->params['email'] => 'Письмо с сайта'])
-//            ->setTo($this->email)
-//            ->setSubject('Account registration at ' . Yii::$app->name)
-//            ->send();
-//    }
 
     /**
      * @return Token|null

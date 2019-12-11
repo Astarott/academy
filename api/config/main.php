@@ -69,10 +69,12 @@ return [
             'rules' => [
                 ''=> 'v1/user/',
                   'getallstudents' => 'v1/user/getallstudents',
-                'POST /v1/mail' => 'v1/user/signup',
-                'signupsecond' => 'v1/user/signupsecond',
-//                  'auth' => 'site/login',
 
+                  'send-mails' => 'v1/user/send-mails',
+
+//                  'auth' => 'site/login',
+                  'POST /v1/mail' => 'v1/user/signup',
+                  '/v1/signup' => 'v1/user/signup-second',
 //                  '<_c:[\w-]+>' => '<_c>/index',
 //                  '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
 //                  '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',

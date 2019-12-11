@@ -5,6 +5,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 use yii\web\IdentityInterface;
 
 /**
@@ -140,10 +141,13 @@ class User extends ActiveRecord implements IdentityInterface
      * @return static|null
      */
     public static function findByVerificationToken($token) {
-        return static::findOne([
-            'verification_token' => $token,
-            'status' => self::STATUS_INACTIVE
-        ]);
+        $query = new Query();
+        $query->select('user_id')->from('token')->where('token' == $token);
+        return $user = $query->createCommand()->query();
+//        return static::findOne([
+//            'verification_token' => $token,
+//            'status' => self::STATUS_INACTIVE
+//        ]);
     }
 
     /**
@@ -169,6 +173,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function getId()
     {
         return $this->getPrimaryKey();
+    }
+
+    public function getVerificationToken()
+    {
+        $query = new Query();
+        $query->select('token')->from('{{token}}')->where('user_id' == $this->id);
+        $token = $query->createCommand()->query();
+        return $token;
     }
 
     /**
