@@ -34,10 +34,11 @@ use yii\web\IdentityInterface;
  * @property UserAnswer[] $userAnswers
  * @property UserRole[] $userRoles
  * @property UserTeam[] $userTeams
+ *
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    const SCENARIO_REGISTER = 'register';
+    const SCENARIO_REGISTER = 'Signupsecond';
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
@@ -46,7 +47,7 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_MENTOR = 13;
     const STATUS_SUPERVISOR = 14;
     const STATUS_SUPERMENTOR = 15;
-
+    public $password;
     public static function tableName()
     {
         return '{{%user}}';
@@ -72,17 +73,17 @@ class User extends ActiveRecord implements IdentityInterface
             [['status', 'created_at', 'updated_at', 'age', 'period', 'last_point'], 'integer'],
             [['work_status'], 'boolean'],
             [['email', 'password_reset_token', 'password_hash', 'phone', 'fio', 'study_place', 'experience', 'comment'], 'string', 'max' => 255],
-            [['email'], 'unique'],
             [['password_reset_token'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED , self::STATUS_LEAD, self::STATUS_STUDENT, self::STATUS_MENTOR, self::STATUS_SUPERVISOR, self::STATUS_SUPERMENTOR]],
-//            [['age'], 'required', 'min' => 18, 'on' => self::SCENARIO_REGISTER],
+            [['age'], 'integer' , 'min' => 18, 'on' => self::SCENARIO_REGISTER],
+            [['password'], 'string' , 'min' => 8, 'max'=> 30, 'on' => self::SCENARIO_REGISTER],
         ];
     }
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['self::SCENARIO_REGISTER'] = ['age'];
+        $scenarios['self::SCENARIO_REGISTER'] = ['age','password','email'];
         return $scenarios;
     }
     /**
@@ -238,10 +239,10 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function SignupSecond(){
         $_user = new User();
+        $_user->scenario = User::SCENARIO_REGISTER;
         $_user->email = $this->email;
-        $_user->phone = $this->phone;
-        $_user->fio = $this->fio;
-
-        return $_user->save();
+        $_user->age = $this->age;
+        $_user->save();
+        return $_user;
     }
 }
