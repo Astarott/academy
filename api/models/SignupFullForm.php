@@ -2,59 +2,57 @@
 
 namespace api\models;
 
-//use api\models\Token;
+use api\models\Token;
 
 use common\models\User;
 use Yii;
+use yii\base\Model;
 
 class SignupFullForm extends User
 {
-//    public $email;
-//    public $phone;
-//    public $fio;
-//    public $
+    //Есть в базе
+    public $email;
+    public $phone;
+    public $fio;
 
+    //Новые поля
+    public $userRoles;
+    public $password;
+    public $age;
+    public $experience;
+    public $study_place;
+    public $period;
+    public $work_status;
+    public $comment;
+//    public $confirmed_password;
 
-
-
+    private $_user;
 
     public function rules()
     {
         return [
-            // username and password are both required
-            [['email', 'phone', 'fio'], 'required'],
-
-            ['email', 'trim'],
-            ['email', 'email'],
-            ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
+            //Прописать всю валидацию
+//            // username and password are both required
+//            [['email', 'phone', 'fio'], 'required'],
+//
+//            ['email', 'trim'],
+//            ['email', 'email'],
+//            ['email', 'string', 'max' => 255],
+//            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
 
         ];
     }
 
-    public function signupfirst()
+    public function signup()
     {
-        if (!$this->validate())
-        {
-            return null;
+        if (!$this->validate()) {
+//            return ($_user->getErrors());
+            return "NE PROSHLO";
         }
-        $user = new User();
-        $user->status = User::STATUS_LEAD;
-        $user->email = $this->email;
-        $user->phone = $this->phone;
-        $user->fio = $this->fio;
-        return $user->save() && $this->sendEmail($user);
-    }
 
-
-    public function signupfull()
-    {
-        if (!$this->validate())
-        {
-            return null;
-        };
-//        $user ->getuser();
-//        $user->status = User::STATUS_LEAD;
+        $_user = User::findByEmail($this->email);
+        $_user->status = User::STATUS_STUDENT;
+        return ($_user);
 //        $user->email = $this->email;
 //        $user->phone = $this->phone;
 //        $user->fio = $this->fio;
