@@ -37,6 +37,7 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+    const SCENARIO_REGISTER = 'register';
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
@@ -67,11 +68,23 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
+            [['status', 'created_at', 'updated_at', 'age', 'period', 'last_point'], 'default', 'value' => null],
+            [['status', 'created_at', 'updated_at', 'age', 'period', 'last_point'], 'integer'],
+            [['work_status'], 'boolean'],
+            [['email', 'password_reset_token', 'password_hash', 'phone', 'fio', 'study_place', 'experience', 'comment'], 'string', 'max' => 255],
+            [['email'], 'unique'],
+            [['password_reset_token'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED , self::STATUS_LEAD, self::STATUS_STUDENT, self::STATUS_MENTOR, self::STATUS_SUPERVISOR, self::STATUS_SUPERMENTOR]],
+//            [['age'], 'required', 'min' => 18, 'on' => self::SCENARIO_REGISTER],
         ];
     }
-
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['self::SCENARIO_REGISTER'] = ['age'];
+        return $scenarios;
+    }
     /**
      * {@inheritdoc}
      */
@@ -221,5 +234,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    public function SignupSecond(){
+        $_user = new User();
+        $_user->email = $this->email;
+        $_user->phone = $this->phone;
+        $_user->fio = $this->fio;
+
+        return $_user->save();
     }
 }
