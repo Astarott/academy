@@ -28,7 +28,7 @@ class m130524_201442_init extends Migration
 
             //Новое
             'password_hash' => $this->string(),
-            'auth_key' => $this->string(32),
+//            'auth_key' => $this->string(32),
 
             //Студент
             'phone' => $this-> string(),
