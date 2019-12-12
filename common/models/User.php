@@ -1,6 +1,8 @@
 <?php
 namespace common\models;
 
+use app\models\Role;
+use app\models\UserRole;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -21,7 +23,6 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
- *
  * @property string|null $phone
  * @property string|null $fio
  * @property int|null $age
@@ -49,6 +50,7 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_SUPERVISOR = 14;
     const STATUS_SUPERMENTOR = 15;
     public $password;
+    public $role_id;
     public static function tableName()
     {
         return '{{%user}}';
@@ -73,6 +75,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['status', 'created_at', 'updated_at', 'age', 'period', 'last_point'], 'default', 'value' => null],
             [['status', 'created_at', 'updated_at', 'age', 'period', 'last_point'], 'integer'],
             [['work_status'], 'boolean'],
+            [['role_id'], 'integer'],
             [['email', 'password_reset_token', 'password_hash', 'phone', 'fio', 'study_place', 'experience', 'comment'], 'string', 'max' => 255],
             [['password_reset_token'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
@@ -84,7 +87,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['self::SCENARIO_REGISTER'] = ['age','password','email'];
+        $scenarios['self::SCENARIO_REGISTER'] = ['age','password','email','role_id'];
         return $scenarios;
     }
     /**
@@ -256,8 +259,12 @@ class User extends ActiveRecord implements IdentityInterface
         $_user->comment = $this->comment;
         $_user->experience = $this->experience;
         $_user->last_point = $this->last_point;
-        if ($_user->save()){
-            return $_user;
+        $_role = new UserRole();
+        $_role->role_id = $this->role_id;
+        $_role->user_id = $this->id;
+        $_role->save();
+        if ($_user->save() ){
+            return $_role;
         }
         return ['message' => $_user->getErrors()];
     }
