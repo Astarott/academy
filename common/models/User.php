@@ -23,6 +23,8 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ * @property string $role_name write-only role_name
+ * @property string $role_id write-only role_id
  * @property string|null $phone
  * @property string|null $fio
  * @property int|null $age
@@ -51,6 +53,7 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_SUPERMENTOR = 15;
     public $password;
     public $role_id;
+    public $role_name;
 
     public static function tableName()
     {
@@ -77,6 +80,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['status', 'created_at', 'updated_at', 'age', 'period', 'last_point'], 'integer'],
             [['work_status'], 'boolean'],
             [['role_id'], 'integer'],
+            [['role_name'], 'string'],
             [['email', 'password_reset_token', 'password_hash', 'phone', 'fio', 'study_place', 'experience', 'comment'], 'string', 'max' => 255],
             [['password_reset_token'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
@@ -88,7 +92,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['self::SCENARIO_REGISTER'] = ['age','password','email','role_id'];
+        $scenarios['self::SCENARIO_REGISTER'] = ['age','password','email','role_id','period','expirence'];
         return $scenarios;
     }
     /**
@@ -259,14 +263,14 @@ class User extends ActiveRecord implements IdentityInterface
         $_user->period = $this->period;
         $_user->comment = $this->comment;
         $_user->experience = $this->experience;
-        $_user->last_point = $this->last_point;
         $_user->setPassword($password);
+        $_role_name = Role::findOne(['name' => $this->role_name]);
         $_role = new UserRole();
-        $_role->role_id = $this->role_id;
+        $_role->role_id = $_role_name->id;
         $_role->user_id = $this->id;
         $_role->save();
         if ($_user->save() and $_role->save()){
-            return [$_role, $_user, $password];
+            return [$_role, $_user, $_role_name];
         }
         return ['user' => $_user->getErrors(),'user_role' => $_role->getErrors()];
     }
