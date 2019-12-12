@@ -75,6 +75,20 @@ return [
 //                  'auth' => 'site/login',
                   'POST /v1/mail' => 'v1/user/signup',
                   '/v1/signup' => 'v1/user/signup-second',
+
+                //FOR TESTS
+                    'v1/test' => 'v1/test/index',
+                    'v1/start-test' => 'v1/test/start-test',
+//                 [
+//                     'class' => 'yii\rest\UrlRule',
+//                     'controller' => ['v1/test'],
+//                     'extraPatterns' => [
+//                         'GET /' => 'index',
+//
+//                     ]
+//                 ].
+
+
 //                  '<_c:[\w-]+>' => '<_c>/index',
 //                  '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
 //                  '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',

@@ -164,6 +164,17 @@ class User extends ActiveRecord implements IdentityInterface
 //        ]);
     }
 
+    public static function getLastRoleId($user_id)
+    {
+        $query = new Query();
+        $query->select(['role_id','test_date'])->from('user_role')->where(['user_id' => $user_id])->all();
+        $query->orderBy('test_date DESC')->limit(1);
+        $role_id = $query->createCommand()->query();
+//        $query->orderBy('test_date')->limit(1);
+        return $role_id->read('role_id')['role_id'];
+    }
+
+
     /**
      * Finds out if password reset token is valid
      *
