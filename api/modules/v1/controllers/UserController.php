@@ -92,20 +92,15 @@ class UserController extends ActiveController
 
     public function actionSignupSecond()
     {
+        $token = Yii::$app->getRequest()->getQueryParam('token');
+        $user = User::findByVerificationToken($token);
+        if ($user == null) {
+            return (['message' => 'Вы ввели неверный токен']);
+        }
+
         if (Yii::$app->request->isGet)
         {
-            $token = Yii::$app->getRequest()->getQueryParam('token');
 
-            return ($token);
-
-            $user = User::findByVerificationToken($token);
-            http://academy.local/v1/signup
-
-
-            if ($user == null) {
-                return (['message' => 'Вы ввели неверный токен']);
-            }
-            return ($user);
 //        }
 //        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
 //        return ($model->email);

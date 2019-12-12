@@ -180,7 +180,7 @@ class User extends ActiveRecord implements IdentityInterface
         $query = new Query();
         $query->select('token')->from('{{token}}')->where('user_id' == $this->id);
         $token = $query->createCommand()->query();
-        return $token;
+        return $token->read('token');
     }
 
     /**

@@ -27,6 +27,11 @@ class Token extends ActiveRecord
         $this->token = \Yii::$app->security->generateRandomString();
     }
 
+    public function getToken()
+    {
+        $this->token;
+    }   
+
     public function fields()
     {
         return [
