@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use app\models\Role;
@@ -80,21 +81,26 @@ class User extends ActiveRecord implements IdentityInterface
             [['status', 'created_at', 'updated_at', 'age', 'period', 'last_point'], 'integer'],
             [['work_status'], 'boolean'],
             [['role_id'], 'integer'],
+            [['password'], 'string'],
             [['role_name'], 'string'],
             [['email', 'password_reset_token', 'password_hash', 'phone', 'fio', 'study_place', 'experience', 'comment'], 'string', 'max' => 255],
             [['password_reset_token'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED , self::STATUS_LEAD, self::STATUS_STUDENT, self::STATUS_MENTOR, self::STATUS_SUPERVISOR, self::STATUS_SUPERMENTOR]],
-            [['age'], 'integer' , 'min' => 18, 'on' => self::SCENARIO_REGISTER],
-            [['password'], 'string' , 'min' => 8, 'max'=> 30, 'on' => self::SCENARIO_REGISTER],
+            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED, self::STATUS_LEAD, self::STATUS_STUDENT, self::STATUS_MENTOR, self::STATUS_SUPERVISOR, self::STATUS_SUPERMENTOR]],
+            [['age'], 'integer', 'min' => 18, 'on' => self::SCENARIO_REGISTER],
+            [['age', 'role_name', 'password', 'experience'], 'required', 'on' => self::SCENARIO_REGISTER, 'message' => 'Укажите {attribute}'],
+            [['password'], 'string', 'min' => 8, 'on' => self::SCENARIO_REGISTER],
+            [['password'], 'string', 'max' => 30, 'on' => self::SCENARIO_REGISTER]
         ];
     }
+
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['self::SCENARIO_REGISTER'] = ['age','password','email','role_id','period','expirence'];
+        $scenarios['self::SCENARIO_REGISTER'] = ['age', 'password', 'email', 'role_id', 'period', 'experience', 'role_name', 'comment'];
         return $scenarios;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -123,7 +129,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-
     /**
      * Finds user by password reset token
      *
@@ -148,7 +153,8 @@ class User extends ActiveRecord implements IdentityInterface
      * @param string $token verify email token
      * @return static|null
      */
-    public static function findByVerificationToken($token) {
+    public static function findByVerificationToken($token)
+    {
         $query = new Query();
         $query->select('user_id')->from('token')->where('token' == $token);
         return $user = $query->createCommand()->query()->read('user_id');
@@ -170,7 +176,7 @@ class User extends ActiveRecord implements IdentityInterface
             return false;
         }
 
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $timestamp = (int)substr($token, strrpos($token, '_') + 1);
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
         return $timestamp + $expire >= time();
     }
@@ -257,21 +263,25 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
-    public function SignupSecond($_user, $password){
+    public function SignupSecond($_user)
+    {
         $_user->scenario = User::SCENARIO_REGISTER;
         $_user->age = $this->age;
         $_user->period = $this->period;
         $_user->comment = $this->comment;
         $_user->experience = $this->experience;
-        $_user->setPassword($password);
+        $_user->setPassword($this->password);
+        if (!Role::findOne(['name' => $this->role_name])) {
+            return ['message' => 'роли ' . $this->role_name . ' не существует'];
+        }
         $_role_name = Role::findOne(['name' => $this->role_name]);
         $_role = new UserRole();
         $_role->role_id = $_role_name->id;
         $_role->user_id = $this->id;
         $_role->save();
-        if ($_user->save() and $_role->save()){
+        if ($_user->save() and $_role->save()) {
             return [$_role, $_user, $_role_name];
         }
-        return ['user' => $_user->getErrors(),'user_role' => $_role->getErrors()];
+        return ['user' => $_user->getErrors(), 'user_role' => $_role->getErrors()];
     }
 }

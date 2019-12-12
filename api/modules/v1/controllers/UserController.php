@@ -46,14 +46,15 @@ class UserController extends ActiveController
         return ($model);
     }
 
-    public function actionGetallstudents(){
+    public function actionGetallstudents()
+    {
         $query = new Query();
-        $query->select(['user.fio','role.name AS role','team.name AS team_name', 'last_point'])->from('{{user}}')
-            ->join('JOIN','{{public.token}}','public.user.id = public.token.user_id')
-            ->join('JOIN','{{public.user_role}}','public.user.id = public.user_role.user_id')
-            ->join('JOIN','{{public.role}}','public.user_role.role_id = public.role.id')
-            ->join('JOIN','{{public.user_team}}','public.user.id = public.user_team.user_id')
-            ->join('JOIN','{{public.team}}','public.user_team.team_id = public.team.id')
+        $query->select(['user.fio', 'role.name AS role', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
             ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'true'])->all();
         $command = $query->createCommand();
         $resp = $command->query();
@@ -105,17 +106,14 @@ class UserController extends ActiveController
         if (Yii::$app->getRequest()->isPost) {
             $user = User::findOne(['id' => $user_id]);
             $user->load(Yii::$app->getRequest()->getBodyParams(), '');
-            $password = Yii::$app->request->post('password');
-            return $user->SignupSecond($user, $password);
-        }
-        elseif (Yii::$app->getRequest()->isGet){
+            return $user->SignupSecond($user);
+        } elseif (Yii::$app->getRequest()->isGet) {
             $query = new Query();
-            $query->select(['fio','email', 'phone'])->from('{{user}}')->where(['id' => $user_id])->one();
+            $query->select(['fio', 'email', 'phone'])->from('{{user}}')->where(['id' => $user_id])->one();
             $command = $query->createCommand();
             $resp = $command->query();
             return $resp;
-        }
-        else {
+        } else {
             return ['message' => 'РАзрешены только GET и POST запросы'];
         }
 //        }
