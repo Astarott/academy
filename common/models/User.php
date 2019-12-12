@@ -263,9 +263,9 @@ class User extends ActiveRecord implements IdentityInterface
         $_role->role_id = $this->role_id;
         $_role->user_id = $this->id;
         $_role->save();
-        if ($_user->save() ){
-            return $_role;
+        if ($_user->save() and $_role->save()){
+            return [$_role, $_user];
         }
-        return ['message' => $_user->getErrors()];
+        return ['user' => $_user->getErrors(),'user_role' => $_role->getErrors()];
     }
 }
