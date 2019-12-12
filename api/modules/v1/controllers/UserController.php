@@ -112,6 +112,7 @@ class UserController extends ActiveController
             $query->select(['fio', 'email', 'phone'])->from('{{user}}')->where(['id' => $user_id])->one();
             $command = $query->createCommand();
             $resp = $command->query();
+
             return $resp;
         } else {
             return ['message' => 'РАзрешены только GET и POST запросы'];

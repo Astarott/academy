@@ -70,7 +70,7 @@ return [
                 ''=> 'v1/user/',
                   'getallstudents' => 'v1/user/getallstudents',
 
-                  'send-mails' => 'v1/user/send-mails',
+                  'POST send-mails' => 'v1/user/send-mails',
 
 //                  'auth' => 'site/login',
                   'POST /v1/mail' => 'v1/user/signup',
