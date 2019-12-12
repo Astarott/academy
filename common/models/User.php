@@ -249,11 +249,13 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
-    public function SignupSecond(){
-        $_user = new User();
+    public function SignupSecond($_user){
         $_user->scenario = User::SCENARIO_REGISTER;
-        $_user->email = $this->email;
         $_user->age = $this->age;
+        $_user->period = $this->period;
+        $_user->age = $this->age;
+        $_user->experience = $this->experience;
+        $_user->last_point = $this->last_point;
         $_user->save();
         return $_user;
     }
