@@ -143,7 +143,7 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findByVerificationToken($token) {
         $query = new Query();
         $query->select('user_id')->from('token')->where('token' == $token);
-        return $user = $query->createCommand()->query();
+        return $user = $query->createCommand()->query()->read('user_id');
 //        return static::findOne([
 //            'verification_token' => $token,
 //            'status' => self::STATUS_INACTIVE

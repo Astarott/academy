@@ -93,17 +93,17 @@ class UserController extends ActiveController
     public function actionSignupSecond()
     {
         $token = Yii::$app->getRequest()->getQueryParam('token');
-        $user = User::findByVerificationToken($token);
-        if ($user == null) {
+        $user_id = User::findByVerificationToken($token);
+        if ($user_id == null) {
             return (['message' => 'Вы ввели неверный токен']);
         }
-
-        if (Yii::$app->request->isGet)
-        {
-
+        if (Yii::$app->getRequest()->isGet) {
+            $user = User::findOne(['id' => $user_id]);
+            return ($user);
+        }
 //        }
 //        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
 //        return ($model->email);
-        }
+
     }
 }
