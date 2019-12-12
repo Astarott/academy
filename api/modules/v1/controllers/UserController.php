@@ -104,8 +104,9 @@ class UserController extends ActiveController
         }
         if (Yii::$app->getRequest()->isPost) {
             $user = User::findOne(['id' => $user_id]);
-            $user->load(Yii::$app->getRequest()->getQueryParams(), '');
-            return $user->SignupSecond($user);
+            $user->load(Yii::$app->getRequest()->getBodyParams(), '');
+            $password = Yii::$app->request->post('password');
+            return $user->SignupSecond($user, $password);
         }
         elseif (Yii::$app->getRequest()->isGet){
             $query = new Query();

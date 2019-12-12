@@ -51,6 +51,7 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_SUPERMENTOR = 15;
     public $password;
     public $role_id;
+
     public static function tableName()
     {
         return '{{%user}}';
@@ -252,19 +253,20 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
-    public function SignupSecond($_user){
+    public function SignupSecond($_user, $password){
         $_user->scenario = User::SCENARIO_REGISTER;
         $_user->age = $this->age;
         $_user->period = $this->period;
         $_user->comment = $this->comment;
         $_user->experience = $this->experience;
         $_user->last_point = $this->last_point;
+        $_user->setPassword($password);
         $_role = new UserRole();
         $_role->role_id = $this->role_id;
         $_role->user_id = $this->id;
         $_role->save();
         if ($_user->save() and $_role->save()){
-            return [$_role, $_user];
+            return [$_role, $_user, $password];
         }
         return ['user' => $_user->getErrors(),'user_role' => $_role->getErrors()];
     }
