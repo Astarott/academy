@@ -253,10 +253,12 @@ class User extends ActiveRecord implements IdentityInterface
         $_user->scenario = User::SCENARIO_REGISTER;
         $_user->age = $this->age;
         $_user->period = $this->period;
-        $_user->age = $this->age;
+        $_user->comment = $this->comment;
         $_user->experience = $this->experience;
         $_user->last_point = $this->last_point;
-        $_user->save();
-        return $_user;
+        if ($_user->save()){
+            return $_user;
+        }
+        return ['message' => $_user->getErrors()];
     }
 }

@@ -107,12 +107,15 @@ class UserController extends ActiveController
             $user->load(Yii::$app->getRequest()->getQueryParams(), '');
             return $user->SignupSecond($user);
         }
-        if (Yii::$app->getRequest()->isGet){
+        elseif (Yii::$app->getRequest()->isGet){
             $query = new Query();
             $query->select(['fio','email', 'phone'])->from('{{user}}')->where(['id' => $user_id])->one();
             $command = $query->createCommand();
             $resp = $command->query();
             return $resp;
+        }
+        else {
+            return ['message' => 'РАзрешены только GET и POST запросы'];
         }
 //        }
 //        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
