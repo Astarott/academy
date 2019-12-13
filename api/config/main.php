@@ -67,27 +67,29 @@ return [
             'showScriptName' => false,
             'enableStrictParsing' => true,
             'rules' => [
-                  'getallstudents' => 'v1/user/getallstudents',
-
+                //FOR MAIL
+                //mail send
                   'POST send-mails' => 'v1/user/send-mails',
-
-//                  'registration'
+                //FOR REGISTRATION
+                //registration
                   'POST /v1/mail' => 'v1/user/signup',
-
                   '/v1/signup' => 'v1/user/signup-second',
+
+
                 //get user
                     'GET /v1/getsdudent' => 'v1/user/getuser',
                 //change team
                 'POST /v1/changeteam' => 'v1/user/change-team',
+                //GET all students where status == 12
+                'getallstudents' => 'v1/user/getallstudents',
                 //FOR TESTS
-                    'v1/test' => 'v1/test/index',
                     'v1/start-test' => 'v1/test/start-test',
 
-                    'getresult' => 'v1/test/count-total-result',
+                    'v1/test/getresult' => 'v1/test/count-total-result',
+
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/user'],
-//                    'prefix' => 'api',
                     'extraPatterns' => [
                         'GET /' => 'index',
                         'POST /v1/mail' => 'signup',

@@ -297,7 +297,7 @@ class User extends ActiveRecord implements IdentityInterface
         $this->last_point = $result;
         $this->status = User::STATUS_STUDENT;
         if ($this->save())
-            return true;
+            return 'true';
         return false;
     }
 
