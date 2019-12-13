@@ -40,4 +40,23 @@ class TestController extends ActiveController
 //            return ['message' => 'Разрешены только GET запросы'];
 
     }
+
+    public function actionCountTotalResult()
+    {
+        $query = new Query();
+        $query->select(['question.id AS question_id', 'answer.id AS right_answer_id', 'user_id'])->from('answer')
+            ->join('JOIN', '{{public.question}}','public.question.id = public.answer.question_id')
+            ->join('INNER JOIN','{{user_answer}}','user_answer.answer_id = answer.id')
+            ->where(['answer.is_right' => true])
+            ->all();
+        $result = $query->createCommand()->query();
+
+//        foreach ($result['user_id'] AS $item)
+
+//        $rightanswers->count($query);
+//        return $rightanswers;
+        return $result;
+//            ->join('JOIN','{{public.}}')
+
+    }
 }

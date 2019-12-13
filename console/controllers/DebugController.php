@@ -11,7 +11,6 @@ class DebugController extends Controller
 {
     public function actionIndex()
     {
-
-        var_dump('kUKU');
+//        vardump($)
     }
 }
