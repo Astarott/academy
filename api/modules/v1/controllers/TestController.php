@@ -30,7 +30,6 @@ class TestController extends ActiveController
         $user_role = User::getLastRoleId($user_id);
 
         $query = new Query();
-//        $query->select(['question_id','question.text','answer_id','answer.text'])->from('answer')->join('JOIN','question')->on()
         $query->select(['question.id AS question_id', 'question.text AS question_text', 'answer.id AS answer_id', 'answer.text AS answer_text'])->from('{{answer}}')
             ->join('JOIN', '{{public.question}}', 'public.question.id = public.answer.question_id')
             ->join('JOIN', '{{public.test_question}}', 'public.test_question.question_id = public.question.id')
