@@ -74,8 +74,9 @@ return [
 
 //                  'auth' => 'site/login',
                   'POST /v1/mail' => 'v1/user/signup',
+                'POST /v1/changeteam' => 'v1/user/change-team',
                   '/v1/signup' => 'v1/user/signup-second',
-
+                    'GET /v1/getsdudent' => 'v1/user/getuser',
                 //FOR TESTS
                     'v1/test' => 'v1/test/index',
                     'v1/start-test' => 'v1/test/start-test',

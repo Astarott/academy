@@ -66,16 +66,8 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function behaviors()
     {
-        $behaviors = parent::behaviors();
-        $behaviors['timestamp'] = [
-            'class' => TimestampBehavior::className(),
-            'attributes' => [
-                'createdAtAttribute' => 'test_date',
-                'updatedAtAttribute' => 'test_date',
-            ],
-            'value' => function(){
-                return date('Y-m-d H:i:s');
-            },
+        return [
+            TimestampBehavior::className(),
         ];
     }
 
@@ -309,4 +301,7 @@ class User extends ActiveRecord implements IdentityInterface
             return true;
         return false;
     }
+
+
+
 }

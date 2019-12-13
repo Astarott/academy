@@ -5,6 +5,7 @@ namespace api\modules\v1\controllers;
 use api\models\SendMailForm;
 use api\models\SignupForm;
 use api\models\SignupFullForm;
+use app\models\UserTeam;
 use common\models\User;
 use Yii;
 use yii\db\Query;
@@ -38,8 +39,6 @@ class UserController extends ActiveController
 
         if ($model->signup())
             return ['message' => 'Пользователь успешно сохранен'];
-//            $response = Yii::$app->getResponse();
-//            $response->setStatusCode(201);
         else if (!$model->hasErrors()) {
             throw new ServerErrorHttpException('Невозможно создать пользователя по неизвестным причинам.');
         }
@@ -118,7 +117,6 @@ class UserController extends ActiveController
             $query->select(['fio', 'email', 'phone'])->from('{{user}}')->where(['id' => $user_id])->one();
             $command = $query->createCommand();
             $resp = $command->query();
-
             return $resp;
         } else {
             return ['message' => 'Разрешены только GET и POST запросы'];
@@ -129,8 +127,22 @@ class UserController extends ActiveController
     {
         $id = Yii::$app->getRequest()->getQueryParam('id');
         $query = new Query();
-        $query->select('*')->from('{{user}}')->where(['id' => $id])->one();
+        $query->select(['user.id','user.fio', 'role.name AS role', 'team.name AS team_name', 'last_point','email'])->from('{{user}}')
+            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->where(['public.user.id' => $id])->orderBy('role')->one();
         $command = $query->createCommand();
-        return $command->query();
+        $resp = $command->query();
+        return $resp;
+    }
+    public function actionChangeTeam()
+    {
+        $user = new UserTeam();
+        $user_id = Yii::$app->getRequest()->getbodyParam('user_id');
+        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+        return $user->ChangeTeam($user_id,$team_id);
     }
 }

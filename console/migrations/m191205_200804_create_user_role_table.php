@@ -18,7 +18,7 @@ class m191205_200804_create_user_role_table extends Migration
             'role_id'=>$this->integer()->notNull(),
 
             'points'=>$this->integer(),
-            'test_date'=>$this->date(),
+            'test_date'=>$this->dateTime(),
         ]);
     }
 
