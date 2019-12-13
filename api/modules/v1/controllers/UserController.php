@@ -49,7 +49,7 @@ class UserController extends ActiveController
     public function actionGetallstudents()
     {
         $query = new Query();
-        $query->select(['user.fio', 'role.name AS role', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+        $query->select(['user.id','user.fio', 'role.name AS role', 'team.name AS team_name', 'last_point'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
             ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
@@ -117,6 +117,5 @@ class UserController extends ActiveController
         } else {
             return ['message' => 'РАзрешены только GET и POST запросы'];
         }
-
     }
 }
