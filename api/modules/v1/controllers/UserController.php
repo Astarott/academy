@@ -55,7 +55,7 @@ class UserController extends ActiveController
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
             ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
             ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
-            ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'true'])->all();
+            ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'true'])->orderBy('role')->all();
         $command = $query->createCommand();
         $resp = $command->query();
         return $resp;
@@ -117,9 +117,6 @@ class UserController extends ActiveController
         } else {
             return ['message' => 'РАзрешены только GET и POST запросы'];
         }
-//        }
-//        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-//        return ($model->email);
 
     }
 }

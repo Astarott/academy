@@ -12,7 +12,7 @@ use yii\rest\ActiveController;
 
 class TestController extends ActiveController
 {
-    public  $modelClass = Test::class;
+    public $modelClass = Test::class;
 
     public function actionIndex()
     {
