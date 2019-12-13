@@ -67,37 +67,24 @@ return [
             'showScriptName' => false,
             'enableStrictParsing' => true,
             'rules' => [
-                ''=> 'v1/user/',
                   'getallstudents' => 'v1/user/getallstudents',
 
                   'POST send-mails' => 'v1/user/send-mails',
 
-//                  'auth' => 'site/login',
+//                  'registration'
                   'POST /v1/mail' => 'v1/user/signup',
-                'POST /v1/changeteam' => 'v1/user/change-team',
+
                   '/v1/signup' => 'v1/user/signup-second',
+                //get user
                     'GET /v1/getsdudent' => 'v1/user/getuser',
+                //change team
+                'POST /v1/changeteam' => 'v1/user/change-team',
                 //FOR TESTS
                     'v1/test' => 'v1/test/index',
                     'v1/start-test' => 'v1/test/start-test',
 
                     'getresult' => 'v1/test/count-total-result',
-//                 [
-//                     'class' => 'yii\rest\UrlRule',
-//                     'controller' => ['v1/test'],
-//                     'extraPatterns' => [
-//                         'GET /' => 'index',
-//
-//                     ]
-//                 ].
-
-
-//                  '<_c:[\w-]+>' => '<_c>/index',
-//                  '<_c:[\w-]+>/<id:\d+>' => '<_c>/view',
-//                  '<_c:[\w-]+>/<id:\d+>/<_a:[\w-]+>' => '<_c>/<_a>',
-
                 [
-//                    'class' => yii\rest\UrlRule::class,
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/user'],
 //                    'prefix' => 'api',
@@ -107,13 +94,6 @@ return [
                         'POST /v1/signup' => 'signup-second',
                     ],
                 ],
-//                [
-//                    'class' => 'yii\rest\UrlRule',
-//                    'controller' => ['v1/site'],
-//                    'extraPatterns' => [
-//                        'GET' => 'index',
-//                    ],
-//                ],
             ],
         ],
 
