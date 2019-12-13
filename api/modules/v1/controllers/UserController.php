@@ -2,17 +2,13 @@
 
 namespace api\modules\v1\controllers;
 
-use api\models\SendMailForm;
 use api\models\SignupForm;
-use api\models\SignupFullForm;
 use app\models\UserTeam;
 use common\models\User;
 use Yii;
 use yii\db\Query;
-use yii\helpers\Url;
 use yii\rest\ActiveController;
 use yii\web\ServerErrorHttpException;
-use function GuzzleHttp\Promise\all;
 
 class UserController extends ActiveController
 {

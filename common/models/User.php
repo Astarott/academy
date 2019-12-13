@@ -3,7 +3,10 @@
 namespace common\models;
 
 use app\models\Role;
+use app\models\Team;
+use app\models\UserAnswer;
 use app\models\UserRole;
+use app\models\UserTeam;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -163,7 +166,7 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getLastRoleId($user_id)
     {
         $query = new Query();
-        $query->select(['role_id','test_date'])->from('user_role')->where(['user_id' => $user_id])->all();
+        $query->select(['role_id', 'test_date'])->from('user_role')->where(['user_id' => $user_id])->all();
         $query->orderBy('test_date DESC')->limit(1);
         $role_id = $query->createCommand()->query();
 //        $query->orderBy('test_date')->limit(1);
@@ -273,10 +276,6 @@ class User extends ActiveRecord implements IdentityInterface
     public function SignupSecond()
     {
         $this->scenario = User::SCENARIO_REGISTER;
-//        $this->age = $this->age;
-//        $this->period = $this->period;
-//        $this->comment = $this->comment;
-//        $this->experience = $this->experience;
         $this->setPassword($this->password);
         if (!Role::findOne(['name' => $this->role_name])) {
             return ['message' => 'роли ' . $this->role_name . ' не существует'];
@@ -301,7 +300,6 @@ class User extends ActiveRecord implements IdentityInterface
             return true;
         return false;
     }
-
 
 
 }
