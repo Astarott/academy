@@ -118,4 +118,13 @@ class UserController extends ActiveController
             return ['message' => 'РАзрешены только GET и POST запросы'];
         }
     }
+
+    public function actionGetuser()
+    {
+        $id = Yii::$app->getRequest()->getQueryParam('id');
+        $query = new Query();
+        $query->select('*')->from('{{user}}')->where(['id' => $id])->one();
+        $command = $query->createCommand();
+        return $command->query();
+    }
 }
