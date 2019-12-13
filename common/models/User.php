@@ -66,8 +66,16 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function behaviors()
     {
-        return [
-            TimestampBehavior::className(),
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::className(),
+            'attributes' => [
+                'createdAtAttribute' => 'test_date',
+                'updatedAtAttribute' => 'test_date',
+            ],
+            'value' => function(){
+                return date('Y-m-d H:i:s');
+            },
         ];
     }
 
@@ -157,7 +165,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $query = new Query();
         $query->select('user_id')->from('token')->where(['token' => $token]);
-        return $user = $query->createCommand()->query()->read('user_id');
+        return $user = $query->createCommand()->query()->read()['user_id'];
     }
 
     public static function getLastRoleId($user_id)
@@ -270,14 +278,14 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
-    public function SignupSecond($_user)
+    public function SignupSecond()
     {
-        $_user->scenario = User::SCENARIO_REGISTER;
-        $_user->age = $this->age;
-        $_user->period = $this->period;
-        $_user->comment = $this->comment;
-        $_user->experience = $this->experience;
-        $_user->setPassword($this->password);
+        $this->scenario = User::SCENARIO_REGISTER;
+//        $this->age = $this->age;
+//        $this->period = $this->period;
+//        $this->comment = $this->comment;
+//        $this->experience = $this->experience;
+        $this->setPassword($this->password);
         if (!Role::findOne(['name' => $this->role_name])) {
             return ['message' => 'роли ' . $this->role_name . ' не существует'];
         }
@@ -285,10 +293,20 @@ class User extends ActiveRecord implements IdentityInterface
         $_role = new UserRole();
         $_role->role_id = $_role_name->id;
         $_role->user_id = $this->id;
+        $_role->test_date = date("Y-m-d H:i:s");
         $_role->save();
-        if ($_user->save() and $_role->save()) {
-            return [$_role, $_user, $_role_name];
+        if ($this->save() and $_role->save()) {
+            return [$_role, $this, $_role_name];
         }
-        return ['user' => $_user->getErrors(), 'user_role' => $_role->getErrors()];
+        return ['user' => $this->getErrors(), 'user_role' => $_role->getErrors()];
+    }
+
+    public function changeTotalResult($result)
+    {
+        $this->last_point = $result;
+        $this->status = User::STATUS_STUDENT;
+        if ($this->save())
+            return true;
+        return false;
     }
 }

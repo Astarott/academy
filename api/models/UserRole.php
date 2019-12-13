@@ -4,6 +4,7 @@ namespace app\models;
 
 use common\models\User;
 use Yii;
+use yii\db\Query;
 
 /**
  * This is the model class for table "user_role".
@@ -54,6 +55,14 @@ class UserRole extends \yii\db\ActiveRecord
             'points' => 'Points',
             'test_date' => 'Test Date',
         ];
+    }
+
+    public function ChangeTotalResult($result)
+    {
+        $this->points = $result;
+        if ($this->save())
+            return (['message' => 'Тест успешно пройден']);
+        return $this->getErrors();
     }
 
     /**

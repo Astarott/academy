@@ -98,7 +98,10 @@ class UserController extends ActiveController
 
     public function actionSignupSecond()
     {
-        $token = Yii::$app->getRequest()->getQueryParam('token');
+        $token = Yii::$app->getRequest()->getBodyParam('token');
+        if (empty($token)) {
+            $token = Yii::$app->getRequest()->getQueryParam('token');
+        }
         $user_id = User::findByVerificationToken($token);
         if ($user_id == null) {
             return (['message' => 'Вы ввели неверный токен']);
@@ -106,7 +109,10 @@ class UserController extends ActiveController
         if (Yii::$app->getRequest()->isPost) {
             $user = User::findOne(['id' => $user_id]);
             $user->load(Yii::$app->getRequest()->getBodyParams(), '');
-            return $user->SignupSecond($user);
+            if ($user->SignupSecond()) {
+                return (['message'=>'Регистрация прошла успешно']);
+            }
+            return ($user->SignupSecond());
         } elseif (Yii::$app->getRequest()->isGet) {
             $query = new Query();
             $query->select(['fio', 'email', 'phone'])->from('{{user}}')->where(['id' => $user_id])->one();
@@ -115,7 +121,7 @@ class UserController extends ActiveController
 
             return $resp;
         } else {
-            return ['message' => 'РАзрешены только GET и POST запросы'];
+            return ['message' => 'Разрешены только GET и POST запросы'];
         }
     }
 

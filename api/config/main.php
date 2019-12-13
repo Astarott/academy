@@ -79,6 +79,8 @@ return [
                 //FOR TESTS
                     'v1/test' => 'v1/test/index',
                     'v1/start-test' => 'v1/test/start-test',
+
+                    'getresult' => 'v1/test/count-total-result',
 //                 [
 //                     'class' => 'yii\rest\UrlRule',
 //                     'controller' => ['v1/test'],

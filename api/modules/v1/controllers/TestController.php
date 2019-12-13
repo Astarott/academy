@@ -5,6 +5,7 @@
 namespace api\modules\v1\controllers;
 
 use api\models\Test;
+use app\models\UserRole;
 use common\models\User;
 use Yii;
 use yii\db\Query;
@@ -43,20 +44,51 @@ class TestController extends ActiveController
 
     public function actionCountTotalResult()
     {
+        $token = Yii::$app->getRequest()->getQueryParam('token');
+
+        $user_id = User::findByVerificationToken($token);
+        if ($user_id == null) {
+            return (['message' => 'Вы ввели неверный токен']);
+        }
+
+        $user_role = User::getLastRoleId($user_id);
+
+        //Подсчет правильных ответов
         $query = new Query();
         $query->select(['question.id AS question_id', 'answer.id AS right_answer_id', 'user_id'])->from('answer')
             ->join('JOIN', '{{public.question}}','public.question.id = public.answer.question_id')
             ->join('INNER JOIN','{{user_answer}}','user_answer.answer_id = answer.id')
             ->where(['answer.is_right' => true])
+            ->andwhere(['user_id' => $user_id])
             ->all();
-        $result = $query->createCommand()->query();
+        $answer_count = $query->createCommand()->query()->count();
 
-//        foreach ($result['user_id'] AS $item)
+        //Подсчет вопросов
+        $question_count = new Query();
+        $question_count->select('question.id')->from('question')
+            ->join('JOIN','{{public.test_question}}','test_question.question_id = question.id')
+            ->join('JOIN','{{public.test}}','test.id = test_question.test_id')
+            ->where(['test.role_id' => $user_role])
+            ->all();
+        $question_count = $question_count->createCommand()->query()->count();
 
-//        $rightanswers->count($query);
-//        return $rightanswers;
-        return $result;
-//            ->join('JOIN','{{public.}}')
 
+//        return $question_count;
+        $result = round(($answer_count / $question_count) * 100);
+
+//        return $result;
+
+        //Айдишник последней роли
+        $user_role_query = new Query();
+        $user_role_query->select('id')->from('user_role')->where(['role_id'=>$user_role])
+            ->orderBy('test_date DESC')->limit(1);
+        $user_last_role = $user_role_query->createCommand()->query()->read()['id'];
+
+        $temp = UserRole::findOne(['id'=>$user_last_role]);
+
+        $user = User::findOne(['id' => $user_id]);
+
+//        return $user;
+        return ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result));
     }
 }
