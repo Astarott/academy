@@ -127,7 +127,7 @@ class UserController extends ActiveController
     {
         $id = Yii::$app->getRequest()->getQueryParam('id');
         $query = new Query();
-        $query->select(['user.id','user.fio', 'role.name AS role', 'team.name AS team_name', 'last_point','email'])->from('{{user}}')
+        $query->select(['user.id','user.fio','user.age','user.experience','user.study_place','user.period','role.name AS role', 'team.name AS team_name', 'last_point','email'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
             ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
@@ -138,6 +138,7 @@ class UserController extends ActiveController
         $resp = $command->query();
         return $resp;
     }
+
     public function actionChangeTeam()
     {
         $user = new UserTeam();

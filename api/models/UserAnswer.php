@@ -3,7 +3,7 @@
 namespace app\models;
 
 use Yii;
-
+use common\models\User;
 /**
  * This is the model class for table "user_answer".
  *
@@ -82,4 +82,15 @@ class UserAnswer extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public function saveuseranswer($user_id,$answer_id,$question_id){
+        $this->answer_id = $answer_id;
+        $this->user_id = $user_id;
+        $this->question_id = $question_id;
+        if ($this->save()){
+            return ['message' => 'Ответ успешно сохранён!'];
+        }
+        return ['message' => $this->getErrors()];
+    }
+
 }

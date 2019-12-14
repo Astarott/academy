@@ -3,7 +3,10 @@
 namespace common\models;
 
 use app\models\Role;
+use app\models\Team;
+use app\models\UserAnswer;
 use app\models\UserRole;
+use app\models\UserTeam;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -163,7 +166,7 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getLastRoleId($user_id)
     {
         $query = new Query();
-        $query->select(['role_id','test_date'])->from('user_role')->where(['user_id' => $user_id])->all();
+        $query->select(['role_id', 'test_date'])->from('user_role')->where(['user_id' => $user_id])->all();
         $query->orderBy('test_date DESC')->limit(1);
         $role_id = $query->createCommand()->query();
 //        $query->orderBy('test_date')->limit(1);
@@ -273,10 +276,6 @@ class User extends ActiveRecord implements IdentityInterface
     public function SignupSecond()
     {
         $this->scenario = User::SCENARIO_REGISTER;
-//        $this->age = $this->age;
-//        $this->period = $this->period;
-//        $this->comment = $this->comment;
-//        $this->experience = $this->experience;
         $this->setPassword($this->password);
         if (!Role::findOne(['name' => $this->role_name])) {
             return ['message' => 'роли ' . $this->role_name . ' не существует'];
@@ -298,10 +297,52 @@ class User extends ActiveRecord implements IdentityInterface
         $this->last_point = $result;
         $this->status = User::STATUS_STUDENT;
         if ($this->save())
-            return true;
+            return 'true';
         return false;
     }
 
+    public function getTeam(){
+        //Получаем роль студента
+        $query = new Query();
+        $query->select(['role_id'])
+            ->from('{{user_role}}')
+            ->where(['user_id' => $this->id])
+            ->one();
+        $test = $query->createCommand()->query()->read()['role_id'];
 
+        //Получаю айдишники команд с такой же ролью
+        $find_like_teams = new Query();
+        $find_like_teams->select('*')->from('user_role')->where(['role_id' => $test])
+            ->join('JOIN','{{public.user_team}}','user_team.user_id = user_role.user_id')
+            ->all();
+        $answer_count = $find_like_teams->createCommand()->query();
+
+        //Создаём массив команд с одинаковой ролью
+        $array = [];
+
+        //Добавляем комманду в массив
+        foreach ($answer_count as $item){
+            array_push($array,$item['team_id']);
+        }
+
+        //получаем весь список комманд
+        $another = new Query();
+        $another->select('*')->from('team')->where(['inSet' => false])
+            ->all();
+        $answ = $another->createCommand()->query();
+
+        $teamadd = new UserTeam();
+        //Добавляем студента в команду где нет такой же роли как у студента
+        foreach ($answ as $item){
+            while (!in_array($item['id'], $array)){
+                $teamadd->user_id = $this->id;
+                $teamadd->team_id = $item['id'];
+                return $teamadd->save();
+            };
+        }
+        $teamadd->user_id = $this->id;
+        $teamadd->team_id = 21;
+        return $teamadd->save();
+    }
 
 }

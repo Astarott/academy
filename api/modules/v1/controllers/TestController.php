@@ -5,6 +5,7 @@
 namespace api\modules\v1\controllers;
 
 use api\models\Test;
+use app\models\UserAnswer;
 use app\models\UserRole;
 use common\models\User;
 use Yii;
@@ -40,6 +41,15 @@ class TestController extends ActiveController
         return $test;
 //            return ['message' => 'Разрешены только GET запросы'];
 
+    }
+
+    public function actionGetanswer(){
+        $token = Yii::$app->getRequest()->getBodyParam('token');
+        $answer = Yii::$app->getRequest()->getBodyParam('answer_id');
+        $question = Yii::$app->getRequest()->getBodyParam('question_id');
+        $user_id = User::findByVerificationToken($token);
+        $user_answer = new UserAnswer();
+        return $user_answer->saveuseranswer($user_id,$answer,$question);
     }
 
     public function actionCountTotalResult()
@@ -88,7 +98,7 @@ class TestController extends ActiveController
 
         $user = User::findOne(['id' => $user_id]);
 
-//        return $user;
-        return ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result));
+       return $user->getTeam();
+//        return ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result) &&  $user->getTeam());
     }
 }
