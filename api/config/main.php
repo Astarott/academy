@@ -72,7 +72,7 @@ return [
                 'getallstudentsinset' => 'v1/user/getallstudentsinset',
 
                   'POST send-mails' => 'v1/user/send-mails',
-
+                'POST login' => 'v1/user/login',
                 'POST changestatusteam' => 'v1/user/change-status-team',
                 'POST disbandteam' => 'v1/user/disbandteam',
 //                  'auth' => 'site/login',
