@@ -69,9 +69,12 @@ return [
             'rules' => [
                 ''=> 'v1/user/',
                   'getallstudents' => 'v1/user/getallstudents',
+                'getallstudentsinset' => 'v1/user/getallstudentsinset',
 
                   'POST send-mails' => 'v1/user/send-mails',
 
+                'POST changestatusteam' => 'v1/user/change-status-team',
+                'POST disbandteam' => 'v1/user/disbandteam',
 //                  'auth' => 'site/login',
                   'POST /v1/mail' => 'v1/user/signup',
                 'POST /v1/changeteam' => 'v1/user/change-team',

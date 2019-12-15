@@ -99,6 +99,11 @@ class TestController extends ActiveController
         $user = User::findOne(['id' => $user_id]);
 
 
-        return ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result) &&  $user->getTeam());
+        if ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result) &&  $user->getTeam()){
+            return ['message' => 'Все ответы записаны! Результаты подсчитаны! Команда присвоена'];
+        }
+        else {
+            return ['message' => 'Неизвестная ошибка'];
+        }
     }
 }

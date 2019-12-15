@@ -6,6 +6,7 @@ use api\models\SendMailForm;
 use api\models\SignupForm;
 use api\models\SignupFullForm;
 use app\models\UserTeam;
+use app\models\Team;
 use common\models\User;
 use Yii;
 use yii\db\Query;
@@ -48,7 +49,22 @@ class UserController extends ActiveController
     public function actionGetallstudents()
     {
         $query = new Query();
-        $query->select(['user.id','user.fio', 'role.name AS role', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+        $query->select(['user.id','user.fio', 'role.name AS role','team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'false'])->orderBy('role')->all();
+        $command = $query->createCommand();
+        $resp = $command->query();
+        return $resp;
+    }
+
+    public function actionGetallstudentsinset()
+    {
+        $query = new Query();
+        $query->select(['user.id','user.fio', 'role.name AS role', 'team.id AS team_id','team.name AS team_name', 'last_point'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
             ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
@@ -59,7 +75,6 @@ class UserController extends ActiveController
         $resp = $command->query();
         return $resp;
     }
-
 
     public function actionSendMails()
     {
@@ -114,7 +129,10 @@ class UserController extends ActiveController
             return ($user->SignupSecond());
         } elseif (Yii::$app->getRequest()->isGet) {
             $query = new Query();
-            $query->select(['fio', 'email', 'phone'])->from('{{user}}')->where(['id' => $user_id])->one();
+            $query->select(['fio', 'email', 'phone','token.token'])->
+            from('{{user}}')->where(['user.id' => $user_id])
+                ->join('JOIN', '{{public.token}}', 'public.token.user_id = public.user.id')
+                ->one();
             $command = $query->createCommand();
             $resp = $command->query();
             return $resp;
@@ -146,4 +164,19 @@ class UserController extends ActiveController
         $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
         return $user->ChangeTeam($user_id,$team_id);
     }
+
+    public function actionChangeStatusTeam()
+    {
+        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+        $team = Team::find()->where(['id' => $team_id])->one();
+        return $team->ChangeStatusTeam();
+    }
+    public function actionDisbandteam()
+    {
+        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+        $team = Team::find()->where(['id' => $team_id])->one();
+        return $team->Disbandteam();
+    }
+
+
 }

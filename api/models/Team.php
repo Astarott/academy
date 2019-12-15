@@ -47,10 +47,10 @@ class Team extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'project' => 'Project',
-            'inSet' => 'In Set',
-            'creator_id' => 'Creator ID',
+            'name' => 'Название команды',
+            'project' => 'Проект Команды',
+            'inSet' => 'Сформированная команда',
+            'creator_id' => 'Создатель команды',
         ];
     }
 
@@ -69,4 +69,33 @@ class Team extends \yii\db\ActiveRecord
     {
         return $this->hasMany(UserTeam::className(), ['team_id' => 'id']);
     }
+    public function ChangeStatusTeam(){
+        if ($this->inSet == false){
+            $this->inSet = true;
+            $this->save();
+            return ['message' => 'Команда сформирована!'];
+        }
+        elseif ($this->inSet == true) {
+            return ['message' => 'Команда уже сформирована!'];
+        }
+        else {
+            return ['message' => $this->getErrors()];
+        }
+    }
+    public function Disbandteam()
+    {
+        $students = UserTeam::find()->where(['team_id' => $this->id])->all();
+        if ($this->id == 21){
+            return ['message' => 'Эту команду нельзя забанить'];
+        }
+        foreach ($students as $item){
+            $student = UserTeam::findOne(['user_id' =>$item['user_id']]);
+            $student->team_id = 21;
+            $student->save();
+        }
+        $this->inSet = false;
+        $this->save();
+        return ['message' => 'Команда забанена!'];
+    }
+
 }
