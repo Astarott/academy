@@ -98,7 +98,7 @@ class TestController extends ActiveController
 
         $user = User::findOne(['id' => $user_id]);
 
-       return $user->getTeam();
-//        return ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result) &&  $user->getTeam());
+
+        return ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result) &&  $user->getTeam());
     }
 }
