@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use common\models\User;
+
 /**
  * This is the model class for table "user_answer".
  *
@@ -52,10 +53,10 @@ class UserAnswer extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'user_id' => 'User ID',
-            'answer_id' => 'Answer ID',
-            'question_id' => 'Question ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'answer_id' => 'ID ответа',
+            'question_id' => 'ID вопроса',
+            'created_at' => 'Дата создания',
+            'updated_at' => 'Дата обновления',
         ];
     }
 
@@ -83,11 +84,14 @@ class UserAnswer extends \yii\db\ActiveRecord
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
-    public function saveuseranswer($user_id,$answer_id,$question_id){
+    public function saveuseranswer($user_id, $answer_id, $question_id)
+    {
         $this->answer_id = $answer_id;
         $this->user_id = $user_id;
         $this->question_id = $question_id;
-        if ($this->save()){
+        $this->created_at = date("Y-m-d H:i:s");
+        $this->updated_at = date("Y-m-d H:i:s");
+        if ($this->save()) {
             return ['message' => 'Ответ успешно сохранён!'];
         }
         return ['message' => $this->getErrors()];

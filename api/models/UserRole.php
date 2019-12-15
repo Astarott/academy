@@ -50,10 +50,10 @@ class UserRole extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'role_id' => 'Role ID',
-            'points' => 'Points',
-            'test_date' => 'Test Date',
+            'user_id' => 'ID пользователя',
+            'role_id' => 'ID роли',
+            'points' => 'Очки теста',
+            'test_date' => 'Дата теста',
         ];
     }
 

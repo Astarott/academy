@@ -90,17 +90,30 @@ class User extends ActiveRecord implements IdentityInterface
             [['password_reset_token'], 'unique'],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED, self::STATUS_LEAD, self::STATUS_STUDENT, self::STATUS_MENTOR, self::STATUS_SUPERVISOR, self::STATUS_SUPERMENTOR]],
-            [['age'], 'integer', 'min' => 18, 'on' => self::SCENARIO_REGISTER],
+            [['age'], 'integer', 'min' => 18, 'on' => self::SCENARIO_REGISTER, 'message' => 'Значение поля Возраст должен не мение 18'],
             [['age', 'role_name', 'password', 'experience'], 'required', 'on' => self::SCENARIO_REGISTER, 'message' => 'Укажите {attribute}'],
             [['password'], 'string', 'min' => 8, 'on' => self::SCENARIO_REGISTER],
-            [['password'], 'string', 'max' => 30, 'on' => self::SCENARIO_REGISTER]
+            [['password'], 'string', 'max' => 30, 'on' => self::SCENARIO_REGISTER],
+            [['work_status'], 'boolean', 'on' => self::SCENARIO_REGISTER]
         ];
     }
-
+    public function attributeLabels()
+    {
+        return [
+            'email' => 'почта',
+            'password_hash' => 'хэш пароля',
+            'password' => 'пароль',
+            'experience' => 'опыт',
+            'role_name' => 'роль',
+            'comment' => 'комментарий',
+            'age' => 'возраст',
+            'phone' => 'номер телефон',
+        ];
+    }
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['self::SCENARIO_REGISTER'] = ['age', 'password', 'email', 'role_id', 'period', 'experience', 'role_name', 'comment'];
+        $scenarios['self::SCENARIO_REGISTER'] = ['age', 'password', 'email', 'role_id', 'period', 'experience', 'role_name', 'comment','work_status'];
         return $scenarios;
     }
 
@@ -285,9 +298,8 @@ class User extends ActiveRecord implements IdentityInterface
         $_role->role_id = $_role_name->id;
         $_role->user_id = $this->id;
         $_role->test_date = date("Y-m-d H:i:s");
-        $_role->save();
         if ($this->save() and $_role->save()) {
-            return [$_role, $this, $_role_name];
+            return ['message' => 'Регистрация прошла успешно!'];
         }
         return ['user' => $this->getErrors(), 'user_role' => $_role->getErrors()];
     }
@@ -300,7 +312,6 @@ class User extends ActiveRecord implements IdentityInterface
             return 'true';
         return false;
     }
-
     public function getTeam(){
         //Получаем роль студента
         $query = new Query();
@@ -324,7 +335,6 @@ class User extends ActiveRecord implements IdentityInterface
         foreach ($answer_count as $item){
             array_push($array,$item['team_id']);
         }
-
         //получаем весь список комманд
         $another = new Query();
         $another->select('*')->from('team')->where(['inSet' => false])
@@ -344,5 +354,4 @@ class User extends ActiveRecord implements IdentityInterface
         $teamadd->team_id = 21;
         return $teamadd->save();
     }
-
 }

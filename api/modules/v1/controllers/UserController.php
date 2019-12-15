@@ -49,7 +49,7 @@ class UserController extends ActiveController
     public function actionGetallstudents()
     {
         $query = new Query();
-        $query->select(['user.id','user.fio', 'role.name AS role','team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
             ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
@@ -64,7 +64,7 @@ class UserController extends ActiveController
     public function actionGetallstudentsinset()
     {
         $query = new Query();
-        $query->select(['user.id','user.fio', 'role.name AS role', 'team.id AS team_id','team.name AS team_name', 'last_point'])->from('{{user}}')
+        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
             ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
@@ -123,13 +123,10 @@ class UserController extends ActiveController
         if (Yii::$app->getRequest()->isPost) {
             $user = User::findOne(['id' => $user_id]);
             $user->load(Yii::$app->getRequest()->getBodyParams(), '');
-            if ($user->SignupSecond()) {
-                return (['message'=>'Регистрация прошла успешно']);
-            }
             return ($user->SignupSecond());
         } elseif (Yii::$app->getRequest()->isGet) {
             $query = new Query();
-            $query->select(['fio', 'email', 'phone','token.token'])->
+            $query->select(['fio', 'email', 'phone', 'token.token'])->
             from('{{user}}')->where(['user.id' => $user_id])
                 ->join('JOIN', '{{public.token}}', 'public.token.user_id = public.user.id')
                 ->one();
@@ -145,7 +142,7 @@ class UserController extends ActiveController
     {
         $id = Yii::$app->getRequest()->getQueryParam('id');
         $query = new Query();
-        $query->select(['user.id','user.fio','user.age','user.experience','user.study_place','user.period','role.name AS role', 'team.name AS team_name', 'last_point','email'])->from('{{user}}')
+        $query->select(['user.id', 'user.fio', 'user.age', 'user.experience', 'user.study_place', 'user.period', 'role.name AS role', 'team.name AS team_name', 'last_point', 'email'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
             ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
@@ -162,7 +159,7 @@ class UserController extends ActiveController
         $user = new UserTeam();
         $user_id = Yii::$app->getRequest()->getbodyParam('user_id');
         $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
-        return $user->ChangeTeam($user_id,$team_id);
+        return $user->ChangeTeam($user_id, $team_id);
     }
 
     public function actionChangeStatusTeam()
@@ -171,6 +168,7 @@ class UserController extends ActiveController
         $team = Team::find()->where(['id' => $team_id])->one();
         return $team->ChangeStatusTeam();
     }
+
     public function actionDisbandteam()
     {
         $team_id = Yii::$app->getRequest()->getbodyParam('team_id');

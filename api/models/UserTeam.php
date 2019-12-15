@@ -48,10 +48,10 @@ class UserTeam extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'team_id' => 'Team ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'user_id' => 'ID команды',
+            'team_id' => 'ID команды',
+            'created_at' => 'Дата создания команды',
+            'updated_at' => 'Дата обновления команды',
         ];
     }
 

@@ -47,9 +47,9 @@ class Answer extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'text' => 'Text',
-            'is_right' => 'Is Right',
-            'question_id' => 'Question ID',
+            'text' => 'Текст ответа',
+            'is_right' => 'Правильный ответ',
+            'question_id' => 'ID вопроса',
         ];
     }
 
