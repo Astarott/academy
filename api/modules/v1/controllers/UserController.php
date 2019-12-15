@@ -3,6 +3,7 @@
 namespace api\modules\v1\controllers;
 
 use api\models\SignupForm;
+use api\models\Token;
 use app\models\UserTeam;
 use app\models\Team;
 use common\models\User;
@@ -14,6 +15,29 @@ use yii\web\ServerErrorHttpException;
 class UserController extends ActiveController
 {
     public $modelClass = User::class;
+
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        // НАследуем поведение родителя
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin' => '*',
+                'Access-Control-Request-Method' => ['GET', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
+                'Access-Control-Request-Headers' => ['Authorization', 'Content-Type'],
+                'Access-Control-Max-Age' => 3600
+            ]
+        ];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+            //  действия "update" только для авторизированных пользователей
+            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','changeteam','disbandteam','change-status-team']
+        ];
+
+        return $behaviors;
+    }
+
 
     protected function verbs()
     {
@@ -44,6 +68,10 @@ class UserController extends ActiveController
 
     public function actionGetallstudents()
     {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
@@ -54,11 +82,18 @@ class UserController extends ActiveController
             ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'false'])->orderBy('role')->all();
         $command = $query->createCommand();
         $resp = $command->query();
-        return $resp;
+        return $resp;}
+        else {
+            return ['message' => 'нет прав!'];
+        }
     }
 
     public function actionGetallstudentsinset()
     {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
@@ -70,10 +105,18 @@ class UserController extends ActiveController
         $command = $query->createCommand();
         $resp = $command->query();
         return $resp;
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
     }
 
     public function actionSendMails()
     {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
         $query->select('user.email')->from('{{user}}')->where('user.status' == 11)->all();
         $command = $query->createCommand()->query();
@@ -85,6 +128,10 @@ class UserController extends ActiveController
             }
         }
         return (['massage' => 'Сообщения были отправлены']);
+        }
+        else {
+                return ['message' => 'нет прав!'];
+            }
     }
 
     /**
@@ -94,6 +141,7 @@ class UserController extends ActiveController
      */
     protected function sendEmail($user)
     {
+
         return Yii::$app
             ->mailer
             ->compose(
@@ -136,6 +184,10 @@ class UserController extends ActiveController
 
     public function actionGetuser()
     {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
         $id = Yii::$app->getRequest()->getQueryParam('id');
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'user.age', 'user.experience', 'user.study_place', 'user.period', 'role.name AS role', 'team.name AS team_name', 'last_point', 'email'])->from('{{user}}')
@@ -148,29 +200,62 @@ class UserController extends ActiveController
         $command = $query->createCommand();
         $resp = $command->query();
         return $resp;
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
     }
 
     public function actionChangeTeam()
     {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
         $user = new UserTeam();
         $user_id = Yii::$app->getRequest()->getbodyParam('user_id');
         $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
         return $user->ChangeTeam($user_id, $team_id);
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
     }
 
     public function actionChangeStatusTeam()
     {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
         $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
         $team = Team::find()->where(['id' => $team_id])->one();
         return $team->ChangeStatusTeam();
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
     }
 
     public function actionDisbandteam()
     {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
         $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
         $team = Team::find()->where(['id' => $team_id])->one();
         return $team->Disbandteam();
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
     }
-
+    public function actionLogin()
+    {
+        $user = new User();
+        $user->load(Yii::$app->getRequest()->getBodyParams(), '');
+        return $user->login();
+    }
 
 }

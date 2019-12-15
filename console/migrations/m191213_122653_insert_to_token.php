@@ -21,7 +21,7 @@ class m191213_122653_insert_to_token extends Migration
      */
     public function safeDown()
     {
-        $this->delete('{{%answer}}', ['in', 'id', [134345,134346,134347]]);
+        $this->delete('{{%token}}', ['in', 'id', [134345,134346,134347]]);
     }
 
     /*

@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use api\models\Token;
 use app\models\Role;
 use app\models\Team;
 use app\models\UserAnswer;
@@ -47,6 +48,7 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface
 {
     const SCENARIO_REGISTER = 'Signupsecond';
+    const SCENARIO_LOGIN = 'login';
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
@@ -94,7 +96,9 @@ class User extends ActiveRecord implements IdentityInterface
             [['age', 'role_name', 'password', 'experience'], 'required', 'on' => self::SCENARIO_REGISTER, 'message' => 'Укажите {attribute}'],
             [['password'], 'string', 'min' => 8, 'on' => self::SCENARIO_REGISTER],
             [['password'], 'string', 'max' => 30, 'on' => self::SCENARIO_REGISTER],
-            [['work_status'], 'boolean', 'on' => self::SCENARIO_REGISTER]
+            [['work_status'], 'boolean', 'on' => self::SCENARIO_REGISTER],
+            [['email'], 'string',  'on' => self::SCENARIO_LOGIN],
+            [['password','password_hash'], 'string', 'on' => self::SCENARIO_LOGIN],
         ];
     }
     public function attributeLabels()
@@ -114,6 +118,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $scenarios = parent::scenarios();
         $scenarios['self::SCENARIO_REGISTER'] = ['age', 'password', 'email', 'role_id', 'period', 'experience', 'role_name', 'comment','work_status'];
+        $scenarios['self::SCENARIO_LOGIN'] = ['password', 'email', 'password_hash'];
         return $scenarios;
     }
 
@@ -130,7 +135,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        return Token::findOne(['token' => $token]);
     }
 
     /**
@@ -353,5 +358,31 @@ class User extends ActiveRecord implements IdentityInterface
         $teamadd->user_id = $this->id;
         $teamadd->team_id = 21;
         return $teamadd->save();
+    }
+
+    public function login()
+    {
+        $this->scenario = User::SCENARIO_LOGIN;
+        $this->validate();
+        if ($this->validate()){
+        if (User::findOne(['email' => $this->email])){
+            $user = User::findOne(['email' => $this->email]);
+            if (Yii::$app->security->validatePassword($this->password, $user->password_hash)){
+                $user_token = Token::findOne(['user_id' => $user->id]);
+                $user_token->token = Yii::$app->security->generateRandomString();
+                $user_token->save();
+                return ['token' => $user_token->token];
+            }
+            else {
+                return ['message' => 'пароль или логин не совпадает'];
+            }
+        }
+        else {
+            return ['message' => 'пароль или логин не совпадает'];
+        }
+    }
+    else {
+        return $this->getErrors();
+    }
     }
 }
