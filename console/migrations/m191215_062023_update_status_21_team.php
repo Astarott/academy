@@ -22,7 +22,6 @@ class m191215_062023_update_status_21_team extends Migration
     {
         echo "m191215_062023_update_status_21_team cannot be reverted.\n";
 
-        return false;
     }
 
     /*

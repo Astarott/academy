@@ -31,7 +31,6 @@ class TestController extends ActiveController
         $user_role = User::getLastRoleId($user_id);
 
         $query = new Query();
-//        $query->select(['question_id','question.text','answer_id','answer.text'])->from('answer')->join('JOIN','question')->on()
         $query->select(['question.id AS question_id', 'question.text AS question_text', 'answer.id AS answer_id', 'answer.text AS answer_text'])->from('{{answer}}')
             ->join('JOIN', '{{public.question}}', 'public.question.id = public.answer.question_id')
             ->join('JOIN', '{{public.test_question}}', 'public.test_question.question_id = public.question.id')
@@ -66,8 +65,8 @@ class TestController extends ActiveController
         //Подсчет правильных ответов
         $query = new Query();
         $query->select(['question.id AS question_id', 'answer.id AS right_answer_id', 'user_id'])->from('answer')
-            ->join('JOIN', '{{public.question}}','public.question.id = public.answer.question_id')
-            ->join('INNER JOIN','{{user_answer}}','user_answer.answer_id = answer.id')
+            ->join('JOIN', '{{public.question}}', 'public.question.id = public.answer.question_id')
+            ->join('INNER JOIN', '{{user_answer}}', 'user_answer.answer_id = answer.id')
             ->where(['answer.is_right' => true])
             ->andwhere(['user_id' => $user_id])
             ->all();
@@ -76,25 +75,21 @@ class TestController extends ActiveController
         //Подсчет вопросов
         $question_count = new Query();
         $question_count->select('question.id')->from('question')
-            ->join('JOIN','{{public.test_question}}','test_question.question_id = question.id')
-            ->join('JOIN','{{public.test}}','test.id = test_question.test_id')
+            ->join('JOIN', '{{public.test_question}}', 'test_question.question_id = question.id')
+            ->join('JOIN', '{{public.test}}', 'test.id = test_question.test_id')
             ->where(['test.role_id' => $user_role])
             ->all();
         $question_count = $question_count->createCommand()->query()->count();
 
-
-//        return $question_count;
         $result = round(($answer_count / $question_count) * 100);
-
-//        return $result;
 
         //Айдишник последней роли
         $user_role_query = new Query();
-        $user_role_query->select('id')->from('user_role')->where(['role_id'=>$user_role])
+        $user_role_query->select('id')->from('user_role')->where(['role_id' => $user_role])
             ->orderBy('test_date DESC')->limit(1);
         $user_last_role = $user_role_query->createCommand()->query()->read()['id'];
 
-        $temp = UserRole::findOne(['id'=>$user_last_role]);
+        $temp = UserRole::findOne(['id' => $user_last_role]);
 
         $user = User::findOne(['id' => $user_id]);
 
