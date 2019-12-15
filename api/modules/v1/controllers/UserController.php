@@ -32,7 +32,7 @@ class UserController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
-            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','changeteam','disbandteam','change-status-team']
+            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','change-team','disbandteam','change-status-team']
         ];
 
         return $behaviors;
