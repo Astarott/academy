@@ -46,6 +46,7 @@ class SignupFullForm extends User
     public function signup()
     {
         if (!$this->validate()) {
+//            User::STATUS_STUDENT;
 //            return ($_user->getErrors());
             return "NE PROSHLO";
         }
@@ -59,24 +60,6 @@ class SignupFullForm extends User
 //        return $user->save() && $this->sendEmail($user);
     }
 
-    /**
-     * Sends confirmation email to user
-     * @param User $user user model to with email should be send
-    //     * @return bool whether the email was sent
-     */
-    protected function sendEmail($user)
-    {
-        return Yii::$app
-            ->mailer
-            ->compose(
-                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-                ['user' => $user]
-            )
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
-            ->setTo($this->email)
-            ->setSubject('Account registration at ' . Yii::$app->name)
-            ->send();
-    }
 
 //    /**
 //     * @return Token|null
