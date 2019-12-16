@@ -2,7 +2,8 @@
 /yii
 /yii_test
 /yii_test.bat
-
+.env
+123.rar
 # phpstorm project files
 .idea
 

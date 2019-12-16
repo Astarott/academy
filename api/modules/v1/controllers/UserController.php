@@ -3,11 +3,12 @@
 namespace api\modules\v1\controllers;
 
 use api\models\SignupForm;
-use api\models\SignupFullForm;
+use api\models\Token;
+use app\models\UserTeam;
+use app\models\Team;
 use common\models\User;
 use Yii;
 use yii\db\Query;
-use yii\helpers\Url;
 use yii\rest\ActiveController;
 use yii\web\ServerErrorHttpException;
 
@@ -15,95 +16,246 @@ class UserController extends ActiveController
 {
     public $modelClass = User::class;
 
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        // НАследуем поведение родителя
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin' => '*',
+                'Access-Control-Request-Method' => ['GET', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
+                'Access-Control-Request-Headers' => ['Authorization', 'Content-Type'],
+                'Access-Control-Max-Age' => 3600
+            ]
+        ];
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+            //  действия "update" только для авторизированных пользователей
+            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','change-team','disbandteam','change-status-team']
+        ];
+
+        return $behaviors;
+    }
+
+
     protected function verbs()
     {
         return [
-            'signup' => ['get','post'],
+            'signup' => ['get', 'post'],
             'mail' => ['post'],
         ];
     }
 
     public function actionSignup()
     {
-//        $requestParams = Yii::$app->getRequest()->getBodyParams();
+        $requestParams = Yii::$app->getRequest()->getBodyParams();
         if (empty($requestParams)) {
             $requestParams = Yii::$app->getRequest()->getQueryParams();
         }
         $model = new SignupForm();
-        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
         $model->phone = $requestParams['phone'];
         $model->email = $requestParams['email'];
         $model->fio = $requestParams['fio'];
 
         if ($model->signup())
             return ['message' => 'Пользователь успешно сохранен'];
-//            $response = Yii::$app->getResponse();
-//            $response->setStatusCode(201);
-        else if (!$model->hasErrors()){
-            throw new ServerErrorHttpException('Невозможно создать пользователя по неизвестным причинам.');}
+        else if (!$model->hasErrors()) {
+            throw new ServerErrorHttpException('Невозможно создать пользователя по неизвестным причинам.');
+        }
         return ($model);
     }
 
-    public function actionGetallstudents(){
+    public function actionGetallstudents()
+    {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
-        $query->select('user.fio')->from('{{token}}')->join('JOIN','{{public.user}}','public.user.id = public.token.user_id')->where(['public.user.status' => 11])->all();
+        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'false'])->orderBy('role')->all();
+        $command = $query->createCommand();
+        $resp = $command->query();
+        return $resp;}
+        else {
+            return ['message' => 'нет прав!'];
+        }
+    }
+
+    public function actionGetallstudentsinset()
+    {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
+        $query = new Query();
+        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'true'])->orderBy('role')->all();
         $command = $query->createCommand();
         $resp = $command->query();
         return $resp;
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
+    }
+
+    public function actionSendMails()
+    {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
+        $query = new Query();
+        $query->select('user.email')->from('{{user}}')->where('user.status' == 11)->all();
+        $command = $query->createCommand()->query();
+        foreach ($command as $item) {
+            $mail = $item["email"];
+            $user = User::findOne(["email" => $mail]);
+            if (!$this->sendEmail($user)) {
+                return ['message' => 'Сообщение пользователю с ' . $mail . ' почтой не отправилось'];
+            }
+        }
+        return (['massage' => 'Сообщения были отправлены']);
+        }
+        else {
+                return ['message' => 'нет прав!'];
+            }
+    }
+
+    /**
+     * Sends confirmation email to user
+     * @param User $user user model to with email should be send
+     * @return bool whether the email was sent
+     */
+    protected function sendEmail($user)
+    {
+
+        return Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
+                ['user' => $user]
+            )
+            ->setFrom([Yii::$app->params['email'] => 'Ссылка на сайт'])
+            ->setTo($user->email)
+            ->setSubject('Account registration at ' . Yii::$app->name)
+            ->send();
     }
 
     public function actionSignupSecond()
     {
-        $model = new User;
-        $model->load(Yii::$app->getRequest()->getBodyParams(),'');
-        return ($model->email);
-
-//        $model = new SignupFullForm();
-//
-//        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-
-        return ($model);
-
-
-
-        return $model;
-
-
-//        $requestParams = Yii::$app->getRequest()->getQueryParams();
-//
-//        $model = new SignupFullForm();
-//        $model->load(Yii::$app->getRequest()->getBodyParams(),'');
-//        return ($model->load(Yii::$app->getRequest()->getBodyParams(),''));
-//        return ($model->attributes);
-//        return ($model->signup());
-//        $model->
-//        $model->userRoles = $requestParams['role'];
-//        $model->age = $requestParams['age'];
-//        $model->password = $requestParams['password'];
-//        $model->experience = $requestParams['experience'];
-//        $model->period = $requestParams['period'];
-//        $model->work_status = $requestParams['work_status'];
-//        $model->comment = $requestParams['comment'];
-//        $model->study_place = $requestParams['study_place'];
-
-//        return ($model->signup());
-
-
-//        $model->
-
-//        return ("TEST");
+        $token = Yii::$app->getRequest()->getBodyParam('token');
+        if (empty($token)) {
+            $token = Yii::$app->getRequest()->getQueryParam('token');
+        }
+        $user_id = User::findByVerificationToken($token);
+        if ($user_id == null) {
+            return (['message' => 'Вы ввели неверный токен']);
+        }
+        if (Yii::$app->getRequest()->isPost) {
+            $user = User::findOne(['id' => $user_id]);
+            $user->load(Yii::$app->getRequest()->getBodyParams(), '');
+            return ($user->SignupSecond());
+        } elseif (Yii::$app->getRequest()->isGet) {
+            $query = new Query();
+            $query->select(['fio', 'email', 'phone', 'token.token'])->
+            from('{{user}}')->where(['user.id' => $user_id])
+                ->join('JOIN', '{{public.token}}', 'public.token.user_id = public.user.id')
+                ->one();
+            $command = $query->createCommand();
+            $resp = $command->query();
+            return $resp;
+        } else {
+            return ['message' => 'Разрешены только GET и POST запросы'];
+        }
     }
-//        return ($model->save());
-//        if ($model->signup())
-//        {
-//            $response = Yii::$app->getResponse();
-//            $response->setStatusCode(201);
-//            $id = implode(',', array_values($model->getPrimaryKey(true)));
-//            $response->getHeaders()->set('Location', Url::toRoute(['view', 'id' => $id], true));
-//        } elseif (!$model->hasErrors())
-//        {
-//            throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
-//        }
-//        return $model;
-//    }
+
+    public function actionGetuser()
+    {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
+        $id = Yii::$app->getRequest()->getQueryParam('id');
+        $query = new Query();
+        $query->select(['user.id', 'user.fio', 'user.age', 'user.experience', 'user.study_place', 'user.period', 'role.name AS role', 'team.name AS team_name', 'last_point', 'email'])->from('{{user}}')
+            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->where(['public.user.id' => $id])->orderBy('role')->one();
+        $command = $query->createCommand();
+        $resp = $command->query();
+        return $resp;
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
+    }
+
+    public function actionChangeTeam()
+    {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
+        $user = new UserTeam();
+        $user_id = Yii::$app->getRequest()->getbodyParam('user_id');
+        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+        return $user->ChangeTeam($user_id, $team_id);
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
+    }
+
+    public function actionChangeStatusTeam()
+    {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
+        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+        $team = Team::find()->where(['id' => $team_id])->one();
+        return $team->ChangeStatusTeam();
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
+    }
+
+    public function actionDisbandteam()
+    {
+        $gettoken = new Token();
+        $token = $gettoken->Getauthtoken();
+        $user = $gettoken->findIdentityByAccessToken($token);
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
+        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+        $team = Team::find()->where(['id' => $team_id])->one();
+        return $team->Disbandteam();
+        }
+        else {
+            return ['message' => 'нет прав!'];
+        }
+    }
+    public function actionLogin()
+    {
+        $user = new User();
+        $user->load(Yii::$app->getRequest()->getBodyParams(), '');
+        return $user->login();
+    }
+
 }
