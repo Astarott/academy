@@ -71,8 +71,6 @@ return [
                 '/v1/signup' => 'v1/user/signup-second',
                 'GET /v1/getsdudent' => 'v1/user/getuser',
                 //FOR TESTS
-                'v1/test' => 'v1/test/index',
-                'v1/start-test' => 'v1/test/start-test',
                 'POST v1/get-answer' => 'v1/test/getanswer',
                 '/getresult' => 'v1/test/count-total-result',
                 [
