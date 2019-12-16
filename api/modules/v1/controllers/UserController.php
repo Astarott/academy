@@ -34,6 +34,13 @@ class UserController extends ActiveController
             //  действия "update" только для авторизированных пользователей
             'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','change-team','disbandteam','change-status-team']
         ];
+        $behaviors['contentNegotiator']=[
+            'class' => \yii\filters\ContentNegotiator::class,
+            'formatParam' => '_format',
+            'formats' => [
+                'application/json' => \yii\web\Response::FORMAT_JSON,
+            ],
+        ];
 
         return $behaviors;
     }
@@ -255,6 +262,12 @@ class UserController extends ActiveController
     {
         $user = new User();
         $user->load(Yii::$app->getRequest()->getBodyParams(), '');
+        return $user->login();
+    }
+    public function actionSendtoken()
+    {
+        $user = new Token();
+        $token = Token::find()->where(['token']);
         return $user->login();
     }
 
