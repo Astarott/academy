@@ -57,33 +57,28 @@ return [
             'enableStrictParsing' => true,
             'rules' => [
                 ''=> 'v1/user/',
-                  'getallstudents' => 'v1/user/getallstudents',
+                'getallstudents' => 'v1/user/getallstudents',
                 'getallstudentsinset' => 'v1/user/getallstudentsinset',
 
-                  'POST send-mails' => 'v1/user/send-mails',
+                'POST sendtoken' => 'v1/user/sendtoken',
+                'POST send-mails' => 'v1/user/send-mails',
                 'POST login' => 'v1/user/login',
                 'POST changestatusteam' => 'v1/user/change-status-team',
                 'POST disbandteam' => 'v1/user/disbandteam',
 
-                  'POST /v1/mail' => 'v1/user/signup',
+                'POST /v1/mail' => 'v1/user/signup',
                 'POST /v1/changeteam' => 'v1/user/change-team',
-                  '/v1/signup' => 'v1/user/signup-second',
-                    'GET /v1/getsdudent' => 'v1/user/getuser',
+                '/v1/signup' => 'v1/user/signup-second',
+                'GET /v1/getsdudent' => 'v1/user/getuser',
                 //FOR TESTS
-                    'v1/test' => 'v1/test/index',
-                    'v1/start-test' => 'v1/test/start-test',
-                    'POST v1/get-answer' => 'v1/test/getanswer',
-
-                    '/getresult' => 'v1/test/count-total-result',
-
-
+                'v1/test' => 'v1/test/index',
+                'v1/start-test' => 'v1/test/start-test',
+                'POST v1/get-answer' => 'v1/test/getanswer',
+                '/getresult' => 'v1/test/count-total-result',
                 [
-
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/user'],
-
                     'extraPatterns' => [
-                        'GET /' => 'index',
                         'POST /v1/mail' => 'signup',
                         'POST /v1/signup' => 'signup-second',
                     ],
