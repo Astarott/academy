@@ -64,7 +64,6 @@ class UserController extends ActiveController
         $model->phone = $requestParams['phone'];
         $model->email = $requestParams['email'];
         $model->fio = $requestParams['fio'];
-
         if ($model->signup())
             return ['message' => 'Пользователь успешно сохранен'];
         else if (!$model->hasErrors()) {
@@ -266,9 +265,14 @@ class UserController extends ActiveController
     }
     public function actionSendtoken()
     {
-        $user = new Token();
-        $token = Token::find()->where(['token']);
-        return $user->login();
+        $token = Yii::$app->getRequest()->post('token');
+        $query = new Query();
+        $query->select(['user.phone', 'user.fio', 'user.email'])->from('{{token}}')
+            ->join('JOIN', '{{public.user}}', 'public.user.id = public.token.user_id')
+            ->where(['public.token.token' => $token])->one();
+        $command = $query->createCommand();
+        $resp = $command->query();
+        return $resp;
     }
 
 }
