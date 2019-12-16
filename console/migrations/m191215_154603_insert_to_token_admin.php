@@ -3,16 +3,17 @@
 use yii\db\Migration;
 
 /**
- * Class m191215_062023_update_status_21_team
+ * Class m191215_154603_insert_to_token_admin
  */
-class m191215_062023_update_status_21_team extends Migration
+class m191215_154603_insert_to_token_admin extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->update( '{{%team}}', ['inSet' => true],['id' => 21] );
+        $this->batchInsert('{{%token}}',['expired_at','id','token','user_id'],
+            [[123134441 , 5 ,'er',5]]);
     }
 
     /**
@@ -20,8 +21,7 @@ class m191215_062023_update_status_21_team extends Migration
      */
     public function safeDown()
     {
-        echo "m191215_062023_update_status_21_team cannot be reverted.\n";
-
+        $this->delete('{{%token}}', ['in', 'id', [5]]);
     }
 
     /*
@@ -33,7 +33,7 @@ class m191215_062023_update_status_21_team extends Migration
 
     public function down()
     {
-        echo "m191215_062023_update_status_21_team cannot be reverted.\n";
+        echo "m191215_154603_insert_to_token_admin cannot be reverted.\n";
 
         return false;
     }

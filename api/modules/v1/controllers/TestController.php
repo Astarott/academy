@@ -15,7 +15,20 @@ use yii\rest\ActiveController;
 class TestController extends ActiveController
 {
     public $modelClass = Test::class;
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        // НАследуем поведение родителя
+        $behaviors['contentNegotiator']=[
+            'class' => \yii\filters\ContentNegotiator::class,
+            'formatParam' => '_format',
+            'formats' => [
+                'application/json' => \yii\web\Response::FORMAT_JSON,
+            ],
+        ];
 
+        return $behaviors;
+    }
     public function actionIndex()
     {
         return "hello there!";

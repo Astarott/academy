@@ -32,7 +32,14 @@ class UserController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
-            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','changeteam','disbandteam','change-status-team']
+            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','change-team','disbandteam','change-status-team']
+        ];
+        $behaviors['contentNegotiator']=[
+            'class' => \yii\filters\ContentNegotiator::class,
+            'formatParam' => '_format',
+            'formats' => [
+                'application/json' => \yii\web\Response::FORMAT_JSON,
+            ],
         ];
 
         return $behaviors;
@@ -57,7 +64,6 @@ class UserController extends ActiveController
         $model->phone = $requestParams['phone'];
         $model->email = $requestParams['email'];
         $model->fio = $requestParams['fio'];
-
         if ($model->signup())
             return ['message' => 'Пользователь успешно сохранен'];
         else if (!$model->hasErrors()) {
@@ -257,5 +263,21 @@ class UserController extends ActiveController
         $user->load(Yii::$app->getRequest()->getBodyParams(), '');
         return $user->login();
     }
+    public function actionSendtoken()
+    {
+        $token = Yii::$app->getRequest()->post('token');
+
+        $query = new Query();
+        if($query->select(['user.phone', 'user.fio', 'user.email'])->from('{{token}}')
+            ->join('JOIN', '{{public.user}}', 'public.user.id = public.token.user_id')
+            ->where(['public.token.token' => $token])->one()){
+        $command = $query->createCommand();
+        $resp = $command->query();
+        return $resp;}
+        else {
+            return ['message' => 'Токен не валидный'];
+        }
+}
+
 
 }
