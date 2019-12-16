@@ -266,13 +266,18 @@ class UserController extends ActiveController
     public function actionSendtoken()
     {
         $token = Yii::$app->getRequest()->post('token');
+
         $query = new Query();
-        $query->select(['user.phone', 'user.fio', 'user.email'])->from('{{token}}')
+        if($query->select(['user.phone', 'user.fio', 'user.email'])->from('{{token}}')
             ->join('JOIN', '{{public.user}}', 'public.user.id = public.token.user_id')
-            ->where(['public.token.token' => $token])->one();
+            ->where(['public.token.token' => $token])->one()){
         $command = $query->createCommand();
         $resp = $command->query();
-        return $resp;
-    }
+        return $resp;}
+        else {
+            return ['message' => 'Токен не валидный'];
+        }
+}
+
 
 }
