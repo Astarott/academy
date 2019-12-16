@@ -197,11 +197,11 @@ class UserController extends ActiveController
         $id = Yii::$app->getRequest()->getQueryParam('id');
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'user.age', 'user.experience', 'user.study_place', 'user.period', 'role.name AS role', 'team.name AS team_name', 'last_point', 'email'])->from('{{user}}')
-            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
-            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
-            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
-            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
-            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
             ->where(['public.user.id' => $id])->orderBy('role')->one();
         $command = $query->createCommand();
         $resp = $command->query();
@@ -266,14 +266,16 @@ class UserController extends ActiveController
     public function actionSendtoken()
     {
         $token = Yii::$app->getRequest()->post('token');
-
         $query = new Query();
         if($query->select(['user.phone', 'user.fio', 'user.email'])->from('{{token}}')
             ->join('JOIN', '{{public.user}}', 'public.user.id = public.token.user_id')
-            ->where(['public.token.token' => $token])->one()){
+            ->where(['public.token.token' => $token])
+            ->one())
+        {
         $command = $query->createCommand();
         $resp = $command->query();
-        return $resp;}
+        return $resp;
+        }
         else {
             return ['message' => 'Токен не валидный'];
         }
