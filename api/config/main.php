@@ -63,7 +63,7 @@ return [
                 '/send-mails' => 'v1/user/send-mails',
                 '/changestatusteam' => 'v1/user/change-status-team',
                 '/disbandteam' => 'v1/user/disbandteam',
-
+                '' => 'v1/user/index',
                 //FOR user registration and authorization
                 '/v1/mail' => 'v1/user/signup',
                 '/v1/signup' => 'v1/user/signup-second',

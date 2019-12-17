@@ -63,6 +63,10 @@ class UserController extends ActiveController
         ];
     }
 
+    public function actionIndex(){
+        return 'Ваша api работает!';
+    }
+
     public function actionSignup()
     {
         $model = new User();
