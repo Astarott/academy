@@ -102,6 +102,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['password','password_hash'], 'string', 'on' => self::SCENARIO_LOGIN],
             [['phone','email','fio'], 'string', 'on' => self::SCENARIO_SIGNUP],
             [['email'], 'unique', 'on' => self::SCENARIO_SIGNUP],
+            [['email'], 'email', 'on' => self::SCENARIO_SIGNUP]
         ];
     }
     public function attributeLabels()
