@@ -32,7 +32,7 @@ class UserController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
-            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','change-team','disbandteam','change-status-team']
+            'only'=>['getuser','get-all-students','get-all-students-inset','send-mails','change-team','disbandteam','change-status-team']
         ];
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
@@ -44,7 +44,16 @@ class UserController extends ActiveController
 
         return $behaviors;
     }
-
+    public function actions()
+    {
+        $actions = parent::actions();
+        // отключить действия "delete" и "create" и "index"
+        unset($actions['index']);
+        unset($actions['create']);
+        unset($actions['delete']);
+        unset($actions['update']);
+        return $actions;
+    }
 
     protected function verbs()
     {
@@ -62,7 +71,7 @@ class UserController extends ActiveController
          return $model->signup();
     }
 
-    public function actionGetallstudents()
+    public function actionGetAllStudents()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
@@ -84,7 +93,7 @@ class UserController extends ActiveController
         }
     }
 
-    public function actionGetallstudentsinset()
+    public function actionGetAllStudentsInset()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
@@ -135,6 +144,7 @@ class UserController extends ActiveController
      * @param User $user user model to with email should be send
      * @return bool whether the email was sent
      */
+
     protected function sendEmail($user)
     {
 
@@ -153,9 +163,6 @@ class UserController extends ActiveController
     public function actionSignupSecond()
     {
         $token = Yii::$app->getRequest()->getBodyParam('token');
-        if (empty($token)) {
-            $token = Yii::$app->getRequest()->getQueryParam('token');
-        }
         $user_id = User::findByVerificationToken($token);
         if ($user_id == null) {
             return (['message' => 'Вы ввели неверный токен']);
