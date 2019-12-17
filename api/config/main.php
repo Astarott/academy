@@ -55,6 +55,8 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+
+
                 //FOR Bulat admin actions
                 '/get-all-students' => 'v1/user/get-all-students',
                 '/get-all-students-inset' => 'v1/user/get-all-students-inset',
@@ -64,6 +66,8 @@ return [
                 '/changestatusteam' => 'v1/user/change-status-team',
                 '/disbandteam' => 'v1/user/disbandteam',
                 '' => 'v1/user/index',
+
+
                 //FOR user registration and authorization
                 '/v1/mail' => 'v1/user/signup',
                 '/v1/signup' => 'v1/user/signup-second',
