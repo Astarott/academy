@@ -56,20 +56,10 @@ class UserController extends ActiveController
 
     public function actionSignup()
     {
-        $requestParams = Yii::$app->getRequest()->getBodyParams();
-        if (empty($requestParams)) {
-            $requestParams = Yii::$app->getRequest()->getQueryParams();
-        }
-        $model = new SignupForm();
-        $model->phone = $requestParams['phone'];
-        $model->email = $requestParams['email'];
-        $model->fio = $requestParams['fio'];
-        if ($model->signup())
-            return ['message' => 'Пользователь успешно сохранен'];
-        else if (!$model->hasErrors()) {
-            throw new ServerErrorHttpException('Невозможно создать пользователя по неизвестным причинам.');
-        }
-        return ($model);
+        $model = new User();
+        $model->scenario = User::SCENARIO_SIGNUP;
+        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
+         return $model->signup();
     }
 
     public function actionGetallstudents()
