@@ -20,15 +20,6 @@ class UserController extends ActiveController
     {
         $behaviors = parent::behaviors();
         // НАследуем поведение родителя
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => '*',
-                'Access-Control-Request-Method' => ['GET', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
-                'Access-Control-Request-Headers' => ['Authorization', 'Content-Type'],
-                'Access-Control-Max-Age' => 3600
-            ]
-        ];
         $behaviors['authenticator'] = [
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
@@ -58,8 +49,8 @@ class UserController extends ActiveController
     protected function verbs()
     {
         return [
-            'signup' => ['get', 'post'],
-            'mail' => ['post'],
+            'index' => ['get'],
+            'login' => ['post'],
         ];
     }
 
