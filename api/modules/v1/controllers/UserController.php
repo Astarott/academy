@@ -44,7 +44,16 @@ class UserController extends ActiveController
 
         return $behaviors;
     }
-
+    public function actions()
+    {
+        $actions = parent::actions();
+        // отключить действия "delete" и "create" и "index"
+        unset($actions['index']);
+        unset($actions['create']);
+        unset($actions['delete']);
+        unset($actions['update']);
+        return $actions;
+    }
 
     protected function verbs()
     {
@@ -62,7 +71,7 @@ class UserController extends ActiveController
          return $model->signup();
     }
 
-    public function actionGetallstudents()
+    public function actionGetAllStudents()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
@@ -84,7 +93,7 @@ class UserController extends ActiveController
         }
     }
 
-    public function actionGetallstudentsinset()
+    public function actionGetAllStudentsInset()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
@@ -153,9 +162,6 @@ class UserController extends ActiveController
     public function actionSignupSecond()
     {
         $token = Yii::$app->getRequest()->getBodyParam('token');
-        if (empty($token)) {
-            $token = Yii::$app->getRequest()->getQueryParam('token');
-        }
         $user_id = User::findByVerificationToken($token);
         if ($user_id == null) {
             return (['message' => 'Вы ввели неверный токен']);
