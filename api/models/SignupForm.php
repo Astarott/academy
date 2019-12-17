@@ -15,6 +15,7 @@ class SignupForm extends User
     public $fio;
 
     private $_user;
+
     public function rules()
     {
         return [
@@ -28,45 +29,16 @@ class SignupForm extends User
         ];
     }
 
-    public function signup()
-    {
-//        return ($this->validate());
-        if (!$this->validate())
-        {
-            return null;
-        }
-        $_user = new User();
-        $_user->status = User::STATUS_LEAD;
-        $_user->email = $this->email;
-        $_user->phone = $this->phone;
-        $_user->fio = $this->fio;
-
-        return $_user->save() && $this->generateTokenToUser();
-//        return $user->save() && $this->sendEmail($user);
-    }
 
     /**
      * @return Token|null
      */
-    protected function generateTokenToUser()
-    {
-            $token = new Token();
-            $token->user_id = $this->getUser()->id;
-            $token->generateToken(time() + 3600 * 24);
-            return $token->save() ? $token : null;
-    }
 
     /**
      * Finds user by [[email]]
      *
      * @return User|null
      */
-    protected function getUser()
-    {
-        if ($this->_user === null) {
-            $this->_user = User::findByEmail($this->email);
-        }
-        return $this->_user;
-    }
+
 
 }

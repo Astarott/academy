@@ -4,7 +4,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $user common\models\User */
 
-$verifyLink = \yii\helpers\Url::to('http://localhost:8081/studentRegistration?token='.$user->getVerificationToken());
+$verifyLink = \yii\helpers\Url::to('http://localhost:8080/studentRegistration?token='.$user->getVerificationToken());
 //(['http://localhost:8081/studentRegistration', 'token' => $user->getVerificationToken()]);
 
 
