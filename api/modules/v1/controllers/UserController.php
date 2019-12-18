@@ -118,12 +118,13 @@ class UserController extends ActiveController
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
-        $query->select('user.email')->from('{{user}}')->where('user.status' == 11)->all();
+        $query->select('user.email')->from('{{user}}')->where(['user.status' => 11])->all();
         $command = $query->createCommand()->query();
         foreach ($command as $item) {
             $mail = $item["email"];
-            $user = User::findOne(["email" => $mail]);
-            if (!$this->sendEmail($user)) {
+            $users = User::findOne(["email" => $mail]);
+            $verifyLink = \yii\helpers\Url::to('http://localhost:8080/studentRegistration?token='.$users->getVerificationToken());
+            if (!$this->sendEmail($users,$verifyLink)) {
                 return ['message' => 'Сообщение пользователю с ' . $mail . ' почтой не отправилось'];
             }
         }
@@ -140,14 +141,14 @@ class UserController extends ActiveController
      * @return bool whether the email was sent
      */
 
-    protected function sendEmail($user)
+    protected function sendEmail($user,$verifyLink)
     {
 
         return Yii::$app
             ->mailer
             ->compose(
                 ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-                ['user' => $user]
+                ['user' => $user,'verifyLink' => $verifyLink]
             )
             ->setFrom([Yii::$app->params['email'] => 'Ссылка на сайт'])
             ->setTo($user->email)
