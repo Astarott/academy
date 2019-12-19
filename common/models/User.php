@@ -49,6 +49,7 @@ class User extends ActiveRecord implements IdentityInterface
 {
     const SCENARIO_REGISTER = 'Signupsecond';
     const SCENARIO_LOGIN = 'login';
+    const SCENARIO_SIGNUP = 'signup';
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
@@ -99,6 +100,9 @@ class User extends ActiveRecord implements IdentityInterface
             [['work_status'], 'boolean', 'on' => self::SCENARIO_REGISTER],
             [['email'], 'string',  'on' => self::SCENARIO_LOGIN],
             [['password','password_hash'], 'string', 'on' => self::SCENARIO_LOGIN],
+            [['phone','email','fio'], 'string', 'on' => self::SCENARIO_SIGNUP],
+            [['email'], 'unique', 'on' => self::SCENARIO_SIGNUP],
+            [['email'], 'email', 'on' => self::SCENARIO_SIGNUP]
         ];
     }
     public function attributeLabels()
@@ -220,7 +224,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function getVerificationToken()
     {
         $query = new Query();
-        $query->select('token')->from('{{token}}')->where('user_id' == $this->id);
+        $query->select('token')->from('{{token}}')->where(['user_id' => $this->id]);
         $token = $query->createCommand()->query();
         return $token->read('token')['token'];
     }
@@ -289,6 +293,25 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    public function signup()
+    {
+        $this->status = User::STATUS_LEAD;
+        $this->validate();
+        if ($this->save() &&  $this->generateTokenToUser()) {
+            return ['message' => 'Вы успешно зарегистрированны'];
+        }
+        else {
+            return $this->getErrors();
+        }
+    }
+    protected function generateTokenToUser()
+    {
+        $token = new Token();
+        $token->user_id = $this->id;
+        $token->generateToken(time() + 3600 * 24);
+        return $token->save() ? $token : false;
     }
 
     public function SignupSecond()
@@ -385,4 +408,5 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->getErrors();
     }
     }
+
 }

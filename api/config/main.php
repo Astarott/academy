@@ -54,27 +54,31 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'enableStrictParsing' => true,
             'rules' => [
-                ''=> 'v1/user/',
-                'getallstudents' => 'v1/user/getallstudents',
-                'getallstudentsinset' => 'v1/user/getallstudentsinset',
 
-                'POST sendtoken' => 'v1/user/sendtoken',
-                'POST send-mails' => 'v1/user/send-mails',
-                'POST login' => 'v1/user/login',
-                'POST changestatusteam' => 'v1/user/change-status-team',
-                'POST disbandteam' => 'v1/user/disbandteam',
 
-                'POST /v1/mail' => 'v1/user/signup',
-                'POST /v1/changeteam' => 'v1/user/change-team',
+                //FOR Bulat admin actions
+                '/get-all-students' => 'v1/user/get-all-students',
+                '/get-all-students-inset' => 'v1/user/get-all-students-inset',
+                '/v1/changeteam' => 'v1/user/change-team',
+                '/v1/getsdudent' => 'v1/user/getuser',
+                '/send-mails' => 'v1/user/send-mails',
+                '/changestatusteam' => 'v1/user/change-status-team',
+                '/disbandteam' => 'v1/user/disbandteam',
+                '' => 'v1/user/index',
+
+
+                //FOR user registration and authorization
+                '/v1/mail' => 'v1/user/signup',
                 '/v1/signup' => 'v1/user/signup-second',
-                'GET /v1/getsdudent' => 'v1/user/getuser',
-                //FOR TESTS
-                'v1/test' => 'v1/test/index',
-                'v1/start-test' => 'v1/test/start-test',
-                'POST v1/get-answer' => 'v1/test/getanswer',
+                '/login' => 'v1/user/login',
+                '/sendtoken' => 'v1/user/sendtoken',
+
+
+                //FOR user tests
+                '/v1/get-answer' => 'v1/test/getanswer',
                 '/getresult' => 'v1/test/count-total-result',
+                '/v1/start-test' => 'v1/test/start-test',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/user'],

@@ -9,6 +9,7 @@ use app\models\UserAnswer;
 use app\models\UserRole;
 use common\models\User;
 use Yii;
+use yii\db\mssql\PDO;
 use yii\db\Query;
 use yii\rest\ActiveController;
 
@@ -29,10 +30,17 @@ class TestController extends ActiveController
 
         return $behaviors;
     }
-    public function actionIndex()
+    public function actions()
     {
-        return "hello there!";
+        $actions = parent::actions();
+        // отключить действия "delete" и "create" и "index"
+        unset($actions['index']);
+        unset($actions['create']);
+        unset($actions['delete']);
+        unset($actions['update']);
+        return $actions;
     }
+
 
     public function actionStartTest()
     {
@@ -42,17 +50,14 @@ class TestController extends ActiveController
             return (['message' => 'Вы ввели неверный токен']);
         }
         $user_role = User::getLastRoleId($user_id);
-
         $query = new Query();
         $query->select(['question.id AS question_id', 'question.text AS question_text', 'answer.id AS answer_id', 'answer.text AS answer_text'])->from('{{answer}}')
             ->join('JOIN', '{{public.question}}', 'public.question.id = public.answer.question_id')
             ->join('JOIN', '{{public.test_question}}', 'public.test_question.question_id = public.question.id')
             ->join('JOIN', '{{public.test}}', 'public.test.id = public.test_question.test_id')
-            ->where(['public.test.role_id' => $user_role])->all();
+            ->where(['public.test.role_id' => $user_id])->all();
         $test = $query->createCommand()->query();
         return $test;
-//            return ['message' => 'Разрешены только GET запросы'];
-
     }
 
     public function actionGetanswer(){

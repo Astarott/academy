@@ -20,19 +20,10 @@ class UserController extends ActiveController
     {
         $behaviors = parent::behaviors();
         // НАследуем поведение родителя
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => '*',
-                'Access-Control-Request-Method' => ['GET', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
-                'Access-Control-Request-Headers' => ['Authorization', 'Content-Type'],
-                'Access-Control-Max-Age' => 3600
-            ]
-        ];
         $behaviors['authenticator'] = [
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
-            'only'=>['getuser','getallstudents','getallstudentsinset','send-mails','change-team','disbandteam','change-status-team']
+            'only'=>['getuser','get-all-students','get-all-students-inset','send-mails','change-team','disbandteam','change-status-team']
         ];
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
@@ -44,35 +35,38 @@ class UserController extends ActiveController
 
         return $behaviors;
     }
-
+    public function actions()
+    {
+        $actions = parent::actions();
+        // отключить действия "delete" и "create" и "index"
+        unset($actions['index']);
+        unset($actions['create']);
+        unset($actions['delete']);
+        unset($actions['update']);
+        return $actions;
+    }
 
     protected function verbs()
     {
         return [
-            'signup' => ['get', 'post'],
-            'mail' => ['post'],
+            'index' => ['get'],
+            'login' => ['post'],
         ];
+    }
+
+    public function actionIndex(){
+        return 'Ваша api работает!';
     }
 
     public function actionSignup()
     {
-        $requestParams = Yii::$app->getRequest()->getBodyParams();
-        if (empty($requestParams)) {
-            $requestParams = Yii::$app->getRequest()->getQueryParams();
-        }
-        $model = new SignupForm();
-        $model->phone = $requestParams['phone'];
-        $model->email = $requestParams['email'];
-        $model->fio = $requestParams['fio'];
-        if ($model->signup())
-            return ['message' => 'Пользователь успешно сохранен'];
-        else if (!$model->hasErrors()) {
-            throw new ServerErrorHttpException('Невозможно создать пользователя по неизвестным причинам.');
-        }
-        return ($model);
+        $model = new User();
+        $model->scenario = User::SCENARIO_SIGNUP;
+        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
+         return $model->signup();
     }
 
-    public function actionGetallstudents()
+    public function actionGetAllStudents()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
@@ -94,7 +88,7 @@ class UserController extends ActiveController
         }
     }
 
-    public function actionGetallstudentsinset()
+    public function actionGetAllStudentsInset()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
@@ -124,12 +118,13 @@ class UserController extends ActiveController
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
-        $query->select('user.email')->from('{{user}}')->where('user.status' == 11)->all();
+        $query->select('user.email')->from('{{user}}')->where(['user.status' => 11])->all();
         $command = $query->createCommand()->query();
         foreach ($command as $item) {
             $mail = $item["email"];
-            $user = User::findOne(["email" => $mail]);
-            if (!$this->sendEmail($user)) {
+            $users = User::findOne(["email" => $mail]);
+            $verifyLink = \yii\helpers\Url::to('http://localhost:8080/studentRegistration?token='.$users->getVerificationToken());
+            if (!$this->sendEmail($users,$verifyLink)) {
                 return ['message' => 'Сообщение пользователю с ' . $mail . ' почтой не отправилось'];
             }
         }
@@ -145,14 +140,15 @@ class UserController extends ActiveController
      * @param User $user user model to with email should be send
      * @return bool whether the email was sent
      */
-    protected function sendEmail($user)
+
+    protected function sendEmail($user,$verifyLink)
     {
 
         return Yii::$app
             ->mailer
             ->compose(
                 ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-                ['user' => $user]
+                ['user' => $user,'verifyLink' => $verifyLink]
             )
             ->setFrom([Yii::$app->params['email'] => 'Ссылка на сайт'])
             ->setTo($user->email)
@@ -163,9 +159,6 @@ class UserController extends ActiveController
     public function actionSignupSecond()
     {
         $token = Yii::$app->getRequest()->getBodyParam('token');
-        if (empty($token)) {
-            $token = Yii::$app->getRequest()->getQueryParam('token');
-        }
         $user_id = User::findByVerificationToken($token);
         if ($user_id == null) {
             return (['message' => 'Вы ввели неверный токен']);
@@ -197,11 +190,11 @@ class UserController extends ActiveController
         $id = Yii::$app->getRequest()->getQueryParam('id');
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'user.age', 'user.experience', 'user.study_place', 'user.period', 'role.name AS role', 'team.name AS team_name', 'last_point', 'email'])->from('{{user}}')
-            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
-            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
-            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
-            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
-            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
             ->where(['public.user.id' => $id])->orderBy('role')->one();
         $command = $query->createCommand();
         $resp = $command->query();
@@ -266,14 +259,16 @@ class UserController extends ActiveController
     public function actionSendtoken()
     {
         $token = Yii::$app->getRequest()->post('token');
-
         $query = new Query();
         if($query->select(['user.phone', 'user.fio', 'user.email'])->from('{{token}}')
             ->join('JOIN', '{{public.user}}', 'public.user.id = public.token.user_id')
-            ->where(['public.token.token' => $token])->one()){
+            ->where(['public.token.token' => $token])
+            ->one())
+        {
         $command = $query->createCommand();
         $resp = $command->query();
-        return $resp;}
+        return $resp;
+        }
         else {
             return ['message' => 'Токен не валидный'];
         }
