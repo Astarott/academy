@@ -42,6 +42,15 @@ class TestController extends ActiveController
     }
 
 
+    protected function verbs()
+    {
+        return [
+            'startTest' => ['GET', 'OPTIONS'],
+            'getAnswer' => ['POST', 'OPTIONS'],
+            'countTotalResult' => ['POST','OPTIONS'],
+        ];
+    }
+
     public function actionStartTest()
     {
         $token = Yii::$app->getRequest()->getQueryParam('token');
@@ -60,7 +69,7 @@ class TestController extends ActiveController
         return $test;
     }
 
-    public function actionGetanswer(){
+    public function actionGetAnswer(){
         $token = Yii::$app->getRequest()->getBodyParam('token');
         $answer = Yii::$app->getRequest()->getBodyParam('answer_id');
         $question = Yii::$app->getRequest()->getBodyParam('question_id');
@@ -108,9 +117,7 @@ class TestController extends ActiveController
         $user_last_role = $user_role_query->createCommand()->query()->read()['id'];
 
         $temp = UserRole::findOne(['id' => $user_last_role]);
-
         $user = User::findOne(['id' => $user_id]);
-
 
         if ($temp->ChangeTotalResult($result) && $user->changeTotalResult($result) &&  $user->getTeam()){
             return ['message' => 'Все ответы записаны! Результаты подсчитаны! Команда присвоена'];

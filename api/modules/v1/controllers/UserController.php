@@ -23,7 +23,14 @@ class UserController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
-            'only'=>['getuser','get-all-students','get-all-students-inset','send-mails','change-team','disbandteam','change-status-team']
+            'only'=>[
+                'get-user',
+                'get-all-students',
+                'get-all-students-in-set',
+                'send-mails',
+                'change-team',
+                'disband-team',
+                'change-status-team']
         ];
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
@@ -49,8 +56,17 @@ class UserController extends ActiveController
     protected function verbs()
     {
         return [
-            'index' => ['get'],
-            'login' => ['post'],
+            'index' => ['GET', 'OPTIONS'],
+            'login' => ['POST', 'OPTIONS'],
+            'signUp' => ['POST','OPTIONS'],
+            'getAllStudents' => ['GET', 'OPTIONS'],
+            'getAllStudentsInSet' => ['GET','OPTIONS'],
+            'sendMails' => ['POST','OPTIONS'],
+            'signUpSecond' => ['GET','POST','OPTIONS'],
+            'changeTeam' => ['POST','OPTIONS'],
+            'changeStatusTeam' => ['POST','OPTIONS'],
+            'disbandTeam' => ['POST','OPTIONS'],
+            'sendToken' => ['POST','OPTIONS'],
         ];
     }
 
@@ -58,12 +74,12 @@ class UserController extends ActiveController
         return 'Ваша api работает!';
     }
 
-    public function actionSignup()
+    public function actionSignUp()
     {
         $model = new User();
         $model->scenario = User::SCENARIO_SIGNUP;
         $model->load(Yii::$app->getRequest()->getBodyParams(), '');
-         return $model->signup();
+        return $model->signup();
     }
 
     public function actionGetAllStudents()
@@ -73,26 +89,32 @@ class UserController extends ActiveController
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
-        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])
+            ->from('{{user}}')
             ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
             ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
             ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
             ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
             ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
-            ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'false'])->orderBy('role')->all();
+            ->where(['public.user.status' => 12])
+            ->andWhere(['public.team.inSet' => 'false'])
+            ->orderBy('role')
+            ->all();
         $command = $query->createCommand();
         $resp = $command->query();
-        return $resp;}
+        return $resp;
+        }
         else {
             return ['message' => 'нет прав!'];
         }
     }
 
-    public function actionGetAllStudentsInset()
+    public function actionGetAllStudentsInSet()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
         $user = $gettoken->findIdentityByAccessToken($token);
+
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
@@ -118,7 +140,7 @@ class UserController extends ActiveController
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
-        $query->select('user.email')->from('{{user}}')->where(['user.status' => 11])->all();
+        $query->select('user.email')->from('{{user}}')->where(['user.status' => User::STATUS_LEAD])->all();
         $command = $query->createCommand()->query();
         foreach ($command as $item) {
             $mail = $item["email"];
@@ -156,7 +178,7 @@ class UserController extends ActiveController
             ->send();
     }
 
-    public function actionSignupSecond()
+    public function actionSignUpSecond()
     {
         $token = Yii::$app->getRequest()->getBodyParam('token');
         $user_id = User::findByVerificationToken($token);
@@ -181,7 +203,7 @@ class UserController extends ActiveController
         }
     }
 
-    public function actionGetuser()
+    public function actionGetUser()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
@@ -236,12 +258,13 @@ class UserController extends ActiveController
         }
     }
 
-    public function actionDisbandteam()
+    public function actionDisbandTeam()
     {
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
         $user = $gettoken->findIdentityByAccessToken($token);
-        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
+        if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) )
+        {
         $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
         $team = Team::find()->where(['id' => $team_id])->one();
         return $team->Disbandteam();
@@ -256,7 +279,7 @@ class UserController extends ActiveController
         $user->load(Yii::$app->getRequest()->getBodyParams(), '');
         return $user->login();
     }
-    public function actionSendtoken()
+    public function actionSendToken()
     {
         $token = Yii::$app->getRequest()->post('token');
         $query = new Query();
@@ -273,6 +296,4 @@ class UserController extends ActiveController
             return ['message' => 'Токен не валидный'];
         }
 }
-
-
 }

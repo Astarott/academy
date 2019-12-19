@@ -59,32 +59,30 @@ return [
 
                 //FOR Bulat admin actions
                 '/get-all-students' => 'v1/user/get-all-students',
-                '/get-all-students-inset' => 'v1/user/get-all-students-inset',
-                '/v1/changeteam' => 'v1/user/change-team',
-                '/v1/getsdudent' => 'v1/user/getuser',
+                '/get-all-students-in-set' => 'v1/user/get-all-students-in-set',
+                '/v1/change-team' => 'v1/user/change-team',
+                '/v1/get-student' => 'v1/user/get-user',
                 '/send-mails' => 'v1/user/send-mails',
-                '/changestatusteam' => 'v1/user/change-status-team',
-                '/disbandteam' => 'v1/user/disbandteam',
+                '/change-status-team' => 'v1/user/change-status-team',
+                '/disband-team' => 'v1/user/disband-team',
                 '' => 'v1/user/index',
 
 
                 //FOR user registration and authorization
-                '/v1/mail' => 'v1/user/signup',
-                '/v1/signup' => 'v1/user/signup-second',
+                '/v1/mail' => 'v1/user/sign-up',
+                '/v1/sign-up' => 'v1/user/sign-up-second',
                 '/login' => 'v1/user/login',
-                '/sendtoken' => 'v1/user/sendtoken',
+                '/send-token' => 'v1/user/send-token',
 
 
                 //FOR user tests
-                '/v1/get-answer' => 'v1/test/getanswer',
-                '/getresult' => 'v1/test/count-total-result',
+                '/v1/get-answer' => 'v1/test/get-answer',
+                '/get-result' => 'v1/test/count-total-result',
                 '/v1/start-test' => 'v1/test/start-test',
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/user'],
                     'extraPatterns' => [
-                        'POST /v1/mail' => 'signup',
-                        'POST /v1/signup' => 'signup-second',
                     ],
                 ],
 

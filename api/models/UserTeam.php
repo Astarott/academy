@@ -73,11 +73,13 @@ class UserTeam extends \yii\db\ActiveRecord
 
     public function ChangeTeam($id,$team_id)
     {
-            if($user_team = self::find()->where(['user_id' => $id])->one()){
-            $user_team->team_id = $team_id;
-            if ($user_team->save())
-                return ['message' => $user_team->user_id.' теперь в команде '.$user_team->team_id];
-            return ['user_team' => $this->getErrors()];}
+            if($user_team = self::find()->where(['user_id' => $id])->one()) {
+                $user_team->team_id = $team_id;
+                if ($user_team->save()) {
+                    return ['message' => $user_team->user_id . ' теперь в команде ' . $user_team->team_id];
+                }
+                return ['user_team' => $this->getErrors()];
+            }
             else {
                 return ['message' => 'Несуществующая команда или пользователь'];
             }

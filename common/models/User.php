@@ -298,7 +298,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function signup()
     {
         $this->status = User::STATUS_LEAD;
-        $this->validate();
+//        $this->validate();
         if ($this->save() &&  $this->generateTokenToUser()) {
             return ['message' => 'Вы успешно зарегистрированны'];
         }
