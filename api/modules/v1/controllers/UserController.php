@@ -30,7 +30,8 @@ class UserController extends ActiveController
                 'send-mails',
                 'change-team',
                 'disband-team',
-                'change-status-team']
+                'change-status-team'
+            ]
         ];
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
@@ -91,11 +92,11 @@ class UserController extends ActiveController
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])
             ->from('{{user}}')
-            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
-            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
-            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
-            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
-            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
             ->where(['public.user.status' => 12])
             ->andWhere(['public.team.inSet' => 'false'])
             ->orderBy('role')
@@ -118,11 +119,11 @@ class UserController extends ActiveController
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
         $query = new Query();
         $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
-            ->join('JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
-            ->join('JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
-            ->join('JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
-            ->join('JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
-            ->join('JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+            ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+            ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+            ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+            ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+            ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
             ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'true'])->orderBy('role')->all();
         $command = $query->createCommand();
         $resp = $command->query();
@@ -185,22 +186,22 @@ class UserController extends ActiveController
         if ($user_id == null) {
             return (['message' => 'Вы ввели неверный токен']);
         }
-        if (Yii::$app->getRequest()->isPost) {
+//        if (Yii::$app->getRequest()->isPost) {
             $user = User::findOne(['id' => $user_id]);
             $user->load(Yii::$app->getRequest()->getBodyParams(), '');
             return ($user->SignupSecond());
-        } elseif (Yii::$app->getRequest()->isGet) {
-            $query = new Query();
-            $query->select(['fio', 'email', 'phone', 'token.token'])->
-            from('{{user}}')->where(['user.id' => $user_id])
-                ->join('JOIN', '{{public.token}}', 'public.token.user_id = public.user.id')
-                ->one();
-            $command = $query->createCommand();
-            $resp = $command->query();
-            return $resp;
-        } else {
-            return ['message' => 'Разрешены только GET и POST запросы'];
-        }
+//        } elseif (Yii::$app->getRequest()->isGet) {
+//            $query = new Query();
+//            $query->select(['fio', 'email', 'phone', 'token.token'])->
+//            from('{{user}}')->where(['user.id' => $user_id])
+//                ->join('JOIN', '{{public.token}}', 'public.token.user_id = public.user.id')
+//                ->one();
+//            $command = $query->createCommand();
+//            $resp = $command->query();
+//            return $resp;
+//        } else {
+//            return ['message' => 'Разрешены только GET и POST запросы'];
+//        }
     }
 
     public function actionGetUser()

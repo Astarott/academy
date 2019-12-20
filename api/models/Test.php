@@ -2,6 +2,9 @@
 
 namespace api\models;
 
+use app\models\Question;
+use app\models\Role;
+use app\models\TestQuestion;
 use Yii;
 
 /**

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use api\models\Test;
 use Yii;
 
 /**

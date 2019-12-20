@@ -4,6 +4,7 @@ namespace api\models;
 
 //use common\models\query\PostQuery;
 use common\models\User;
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
