@@ -23,6 +23,7 @@ class UserController extends ActiveController
         $behaviors = parent::behaviors();
         // НАследуем поведение родителя
         unset($behaviors['authenticator']);
+        $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
             'class' =>  HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
@@ -92,6 +93,17 @@ class UserController extends ActiveController
         return $model->signup();
     }
 
+    public function beforeActionGetAllStudents($action)
+    {
+        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {
+            parent::beforeAction($action);
+            Yii::$app->getResponse()->getHeaders()->set('Content-Type');
+            Yii::$app->end();
+        }
+
+        return parent::beforeAction($action);
+    }
+
     public function actionGetAllStudents()
     {
         $gettoken = new Token();
@@ -117,6 +129,17 @@ class UserController extends ActiveController
         else {
             return ['message' => 'нет прав!'];
         }
+    }
+    public function beforeAction($action)
+    {
+
+        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {
+            parent::beforeAction($action);
+            Yii::$app->getResponse()->getHeaders()->set('Content-Type', 'text/plain');
+            Yii::$app->end();
+        }
+
+        return parent::beforeAction($action);
     }
 
     public function actionGetAllStudentsInSet()
