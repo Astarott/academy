@@ -17,12 +17,13 @@ use yii\web\ServerErrorHttpException;
 class UserController extends ActiveController
 {
     public $modelClass = User::class;
-    public $enableCsrfValidation = false;
+
     public function behaviors()
     {
         $behaviors = parent::behaviors();
         // НАследуем поведение родителя
         unset($behaviors['authenticator']);
+        $behaviors['authenticator']['except'] = ['options'];
         $behaviors['authenticator'] = [
             'class' =>  HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
@@ -36,16 +37,7 @@ class UserController extends ActiveController
                 'change-status-team'
             ]
         ];
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Allow-Credentials' => true,
-                'Access-Control-Allow-Origin:' => ['*'],
-            ],
 
-        ];
 
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
@@ -101,6 +93,17 @@ class UserController extends ActiveController
         return $model->signup();
     }
 
+    public function beforeActionGetAllStudents($action)
+    {
+        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {
+            parent::beforeAction($action);
+            Yii::$app->getResponse()->getHeaders()->set('Content-Type');
+            Yii::$app->end();
+        }
+
+        return parent::beforeAction($action);
+    }
+
     public function actionGetAllStudents()
     {
         $gettoken = new Token();
@@ -126,6 +129,17 @@ class UserController extends ActiveController
         else {
             return ['message' => 'нет прав!'];
         }
+    }
+    public function beforeAction($action)
+    {
+
+        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {
+            parent::beforeAction($action);
+            Yii::$app->getResponse()->getHeaders()->set('Content-Type', 'text/plain');
+            Yii::$app->end();
+        }
+
+        return parent::beforeAction($action);
     }
 
     public function actionGetAllStudentsInSet()
