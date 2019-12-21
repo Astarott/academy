@@ -12,11 +12,18 @@ use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\filters\auth\HttpBearerAuth;
 use yii\rest\ActiveController;
+use yii\web\Controller;
 use yii\web\ServerErrorHttpException;
 
 class UserController extends ActiveController
 {
     public $modelClass = User::class;
+
+    public function beforeAction($action) {
+        if (\Yii::$app->request->getMethod() === 'OPTIONS') {
+            return true;
+        }
+    }
 
     public function behaviors()
     {
@@ -93,16 +100,6 @@ class UserController extends ActiveController
         return $model->signup();
     }
 
-    public function beforeActionGetAllStudents($action)
-    {
-        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {
-            parent::beforeAction($action);
-            Yii::$app->getResponse()->getHeaders()->set('Content-Type');
-            Yii::$app->end();
-        }
-
-        return parent::beforeAction($action);
-    }
 
     public function actionGetAllStudents()
     {
