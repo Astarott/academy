@@ -19,18 +19,25 @@ class UserController extends ActiveController
 {
     public $modelClass = User::class;
 
-    public function beforeAction($action) {
-        if (\Yii::$app->request->getMethod() === 'OPTIONS') {
-            return true;
-        }
+    public function beforeAction($action)
+    {
+//        return true;
     }
 
     public function behaviors()
     {
+
+        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {
+
+            Yii::$app->getResponse()->getHeaders()->set('Allow', 'POST GET PUT');
+
+            Yii::$app->end();
+
+        }
+
         $behaviors = parent::behaviors();
-        // НАследуем поведение родителя
-        unset($behaviors['authenticator']);
-        $behaviors['authenticator']['except'] = ['options'];
+
+        # Наследуем поведение родителя
         $behaviors['authenticator'] = [
             'class' =>  HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
@@ -44,6 +51,8 @@ class UserController extends ActiveController
                 'change-status-team'
             ]
         ];
+        $behaviors['authenticator']['except'] = ['options'];
+
 
 
         $behaviors['contentNegotiator']=[
@@ -56,19 +65,10 @@ class UserController extends ActiveController
 
         return $behaviors;
     }
+
     public function actions()
     {
-        $actions = parent::actions();
-        // отключить действия "delete" и "create" и "index"
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-        ];
-        unset($actions['index']);
-        unset($actions['create']);
-        unset($actions['delete']);
-        unset($actions['update']);
-        return $actions;
-
+        return [];
     }
 
     protected function verbs()
@@ -100,44 +100,41 @@ class UserController extends ActiveController
         return $model->signup();
     }
 
+//    public function beforeAction($action) {
+//        if (\Yii::$app->request->getMethod() === 'OPTIONS') {
+//            return true;
+//        }
+//        return parent::beforeAction($action);
+//    }
 
     public function actionGetAllStudents()
     {
+        \Yii::$app->response->format = 'json';
         $gettoken = new Token();
         $token = $gettoken->Getauthtoken();
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
-        $query = new Query();
-        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])
-            ->from('{{user}}')
-            ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
-            ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
-            ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
-            ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
-            ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
-            ->where(['public.user.status' => 12])
-            ->andWhere(['public.team.inSet' => 'false'])
-            ->orderBy('role')
-            ->all();
-        $command = $query->createCommand();
-        $resp = $command->query();
-        return $resp;
+            $query = new Query();
+            $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])
+                ->from('{{user}}')
+                ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+                ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+                ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+                ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+                ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+                ->where(['public.user.status' => 12])
+                ->andWhere(['public.team.inSet' => 'false'])
+                ->orderBy('role')
+                ->all();
+            $command = $query->createCommand();
+            $resp = $command->query();
+            return $resp;
         }
         else {
             return ['message' => 'нет прав!'];
         }
     }
-    public function beforeAction($action)
-    {
 
-        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {
-            parent::beforeAction($action);
-            Yii::$app->getResponse()->getHeaders()->set('Content-Type', 'text/plain');
-            Yii::$app->end();
-        }
-
-        return parent::beforeAction($action);
-    }
 
     public function actionGetAllStudentsInSet()
     {
@@ -146,17 +143,17 @@ class UserController extends ActiveController
         $user = $gettoken->findIdentityByAccessToken($token);
 
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
-        $query = new Query();
-        $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
-            ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
-            ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
-            ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
-            ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
-            ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
-            ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'true'])->orderBy('role')->all();
-        $command = $query->createCommand();
-        $resp = $command->query();
-        return $resp;
+            $query = new Query();
+            $query->select(['user.id', 'user.fio', 'role.name AS role', 'team.id AS team_id', 'team.name AS team_name', 'last_point'])->from('{{user}}')
+                ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+                ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+                ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+                ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+                ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+                ->where(['public.user.status' => 12])->andWhere(['public.team.inSet' => 'true'])->orderBy('role')->all();
+            $command = $query->createCommand();
+            $resp = $command->query();
+            return $resp;
         }
         else {
             return ['message' => 'нет прав!'];
@@ -169,22 +166,22 @@ class UserController extends ActiveController
         $token = $gettoken->Getauthtoken();
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($gettoken->findIdentityByAccessToken($token) && $user->id == 5){
-        $query = new Query();
-        $query->select('user.email')->from('{{user}}')->where(['user.status' => User::STATUS_LEAD])->all();
-        $command = $query->createCommand()->query();
-        foreach ($command as $item) {
-            $mail = $item["email"];
-            $users = User::findOne(["email" => $mail]);
-            $verifyLink = \yii\helpers\Url::to('http://localhost:8080/studentRegistration?token='.$users->getVerificationToken());
-            if (!$this->sendEmail($users,$verifyLink)) {
-                return ['message' => 'Сообщение пользователю с ' . $mail . ' почтой не отправилось'];
+            $query = new Query();
+            $query->select('user.email')->from('{{user}}')->where(['user.status' => User::STATUS_LEAD])->all();
+            $command = $query->createCommand()->query();
+            foreach ($command as $item) {
+                $mail = $item["email"];
+                $users = User::findOne(["email" => $mail]);
+                $verifyLink = \yii\helpers\Url::to('http://localhost:8080/studentRegistration?token='.$users->getVerificationToken());
+                if (!$this->sendEmail($users,$verifyLink)) {
+                    return ['message' => 'Сообщение пользователю с ' . $mail . ' почтой не отправилось'];
+                }
             }
-        }
-        return (['massage' => 'Сообщения были отправлены']);
+            return (['massage' => 'Сообщения были отправлены']);
         }
         else {
-                return ['message' => 'нет прав!'];
-            }
+            return ['message' => 'нет прав!'];
+        }
     }
 
     /**
@@ -216,9 +213,9 @@ class UserController extends ActiveController
             return (['message' => 'Вы ввели неверный токен']);
         }
 //        if (Yii::$app->getRequest()->isPost) {
-            $user = User::findOne(['id' => $user_id]);
-            $user->load(Yii::$app->getRequest()->getBodyParams(), '');
-            return ($user->SignupSecond());
+        $user = User::findOne(['id' => $user_id]);
+        $user->load(Yii::$app->getRequest()->getBodyParams(), '');
+        return ($user->SignupSecond());
 //        } elseif (Yii::$app->getRequest()->isGet) {
 //            $query = new Query();
 //            $query->select(['fio', 'email', 'phone', 'token.token'])->
@@ -239,18 +236,18 @@ class UserController extends ActiveController
         $token = $gettoken->Getauthtoken();
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
-        $id = Yii::$app->getRequest()->getQueryParam('id');
-        $query = new Query();
-        $query->select(['user.id', 'user.fio', 'user.age', 'user.experience', 'user.study_place', 'user.period', 'role.name AS role', 'team.name AS team_name', 'last_point', 'email'])->from('{{user}}')
-            ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
-            ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
-            ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
-            ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
-            ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
-            ->where(['public.user.id' => $id])->orderBy('role')->one();
-        $command = $query->createCommand();
-        $resp = $command->query();
-        return $resp;
+            $id = Yii::$app->getRequest()->getQueryParam('id');
+            $query = new Query();
+            $query->select(['user.id', 'user.fio', 'user.age', 'user.experience', 'user.study_place', 'user.period', 'role.name AS role', 'team.name AS team_name', 'last_point', 'email'])->from('{{user}}')
+                ->join('FULL JOIN', '{{public.token}}', 'public.user.id = public.token.user_id')
+                ->join('FULL JOIN', '{{public.user_role}}', 'public.user.id = public.user_role.user_id')
+                ->join('FULL JOIN', '{{public.role}}', 'public.user_role.role_id = public.role.id')
+                ->join('FULL JOIN', '{{public.user_team}}', 'public.user.id = public.user_team.user_id')
+                ->join('FULL JOIN', '{{public.team}}', 'public.user_team.team_id = public.team.id')
+                ->where(['public.user.id' => $id])->orderBy('role')->one();
+            $command = $query->createCommand();
+            $resp = $command->query();
+            return $resp;
         }
         else {
             return ['message' => 'нет прав!'];
@@ -263,10 +260,10 @@ class UserController extends ActiveController
         $token = $gettoken->Getauthtoken();
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
-        $user = new UserTeam();
-        $user_id = Yii::$app->getRequest()->getbodyParam('user_id');
-        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
-        return $user->ChangeTeam($user_id, $team_id);
+            $user = new UserTeam();
+            $user_id = Yii::$app->getRequest()->getbodyParam('user_id');
+            $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+            return $user->ChangeTeam($user_id, $team_id);
         }
         else {
             return ['message' => 'нет прав!'];
@@ -279,9 +276,9 @@ class UserController extends ActiveController
         $token = $gettoken->Getauthtoken();
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) ){
-        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
-        $team = Team::find()->where(['id' => $team_id])->one();
-        return $team->ChangeStatusTeam();
+            $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+            $team = Team::find()->where(['id' => $team_id])->one();
+            return $team->ChangeStatusTeam();
         }
         else {
             return ['message' => 'нет прав!'];
@@ -295,9 +292,9 @@ class UserController extends ActiveController
         $user = $gettoken->findIdentityByAccessToken($token);
         if ($user->id == 5 and $gettoken->findIdentityByAccessToken($token) )
         {
-        $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
-        $team = Team::find()->where(['id' => $team_id])->one();
-        return $team->Disbandteam();
+            $team_id = Yii::$app->getRequest()->getbodyParam('team_id');
+            $team = Team::find()->where(['id' => $team_id])->one();
+            return $team->Disbandteam();
         }
         else {
             return ['message' => 'нет прав!'];
@@ -318,12 +315,12 @@ class UserController extends ActiveController
             ->where(['public.token.token' => $token])
             ->one())
         {
-        $command = $query->createCommand();
-        $resp = $command->query();
-        return $resp;
+            $command = $query->createCommand();
+            $resp = $command->query();
+            return $resp;
         }
         else {
             return ['message' => 'Токен не валидный'];
         }
-}
+    }
 }
