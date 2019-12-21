@@ -17,7 +17,7 @@ use yii\web\ServerErrorHttpException;
 class UserController extends ActiveController
 {
     public $modelClass = User::class;
-
+    public $enableCsrfValidation = false;
     public function behaviors()
     {
         $behaviors = parent::behaviors();
