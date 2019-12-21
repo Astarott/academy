@@ -100,13 +100,6 @@ class UserController extends ActiveController
         return $model->signup();
     }
 
-//    public function beforeAction($action) {
-//        if (\Yii::$app->request->getMethod() === 'OPTIONS') {
-//            return true;
-//        }
-//        return parent::beforeAction($action);
-//    }
-
     public function actionGetAllStudents()
     {
         \Yii::$app->response->format = 'json';
