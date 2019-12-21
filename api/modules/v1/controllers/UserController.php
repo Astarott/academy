@@ -46,15 +46,7 @@ class UserController extends ActiveController
             ],
 
         ];
-        $behaviors['access'] = [
-            'class' => AccessControl::className(),
-            'rules' => [
-                [
-                    'allow' => true,
-                    'roles' => ['@'],
-                ],
-            ],
-        ];
+
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
             'formatParam' => '_format',
