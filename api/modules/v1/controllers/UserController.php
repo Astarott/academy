@@ -17,7 +17,7 @@ use yii\web\ServerErrorHttpException;
 class UserController extends ActiveController
 {
     public $modelClass = User::class;
-    public $enableCsrfValidation = false;
+
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -36,16 +36,7 @@ class UserController extends ActiveController
                 'change-status-team'
             ]
         ];
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Allow-Credentials' => true,
-                'Access-Control-Allow-Origin:' => ['*'],
-            ],
 
-        ];
 
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
