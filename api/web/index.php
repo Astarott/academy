@@ -4,7 +4,6 @@ defined('YII_ENV') or define('YII_ENV', 'dev');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization');
 header('Access-Control-Request-Headers: *');
-
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/../../vendor/yiisoft/yii2/Yii.php';
 require __DIR__ . '/../../common/config/bootstrap.php';
