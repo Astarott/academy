@@ -42,6 +42,7 @@ class UserController extends ActiveController
                 'Origin' => ['*'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
                 'Access-Control-Allow-Credentials' => true,
+                'Access-Control-Allow-Origin:' => ['*'],
             ],
 
         ];
