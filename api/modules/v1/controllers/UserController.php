@@ -9,6 +9,8 @@ use app\models\Team;
 use common\models\User;
 use Yii;
 use yii\db\Query;
+use yii\filters\AccessControl;
+use yii\filters\auth\HttpBearerAuth;
 use yii\rest\ActiveController;
 use yii\web\ServerErrorHttpException;
 
@@ -20,8 +22,9 @@ class UserController extends ActiveController
     {
         $behaviors = parent::behaviors();
         // НАследуем поведение родителя
+        unset($behaviors['authenticator']);
         $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+            'class' =>  HttpBearerAuth::className(),
             //  действия "update" только для авторизированных пользователей
             'only'=>[
                 'get-user',
@@ -32,6 +35,24 @@ class UserController extends ActiveController
                 'disband-team',
                 'change-status-team'
             ]
+        ];
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin' => ['*'],
+                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                'Access-Control-Allow-Credentials' => true,
+            ],
+
+        ];
+        $behaviors['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
+            ],
         ];
         $behaviors['contentNegotiator']=[
             'class' => \yii\filters\ContentNegotiator::class,
@@ -47,11 +68,15 @@ class UserController extends ActiveController
     {
         $actions = parent::actions();
         // отключить действия "delete" и "create" и "index"
+        $actions['options'] = [
+            'class' => 'yii\rest\OptionsAction',
+        ];
         unset($actions['index']);
         unset($actions['create']);
         unset($actions['delete']);
         unset($actions['update']);
         return $actions;
+
     }
 
     protected function verbs()
